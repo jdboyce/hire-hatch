@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobTableComponent } from './job-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatTableDataSource } from '@angular/material/table';
-import { MOCK_DATA } from 'src/app/models/job.model';
+import { Job, MOCK_DATA } from 'src/app/models/job.model';
 
 describe('JobTableComponent', () => {
   let component: JobTableComponent;
@@ -11,7 +11,7 @@ describe('JobTableComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [JobTableComponent],
-      imports: [MatTableModule]
+      imports: [MatTableModule],
     }).compileComponents();
   });
 
@@ -26,11 +26,38 @@ describe('JobTableComponent', () => {
   });
 
   it('should have the correct displayed columns', () => {
-    expect(component.displayedColumns).toEqual(['jobTitle', 'companyName', 'priority', 'status', 'source', 'postingUrl', 'notes']);
+    expect(component.displayedColumns).toEqual([
+      'jobTitle',
+      'companyName',
+      'priority',
+      'status',
+      'source',
+      'postingUrl',
+      'notes',
+    ]);
   });
 
   it('should have the correct data source', () => {
     expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
     expect(component.dataSource.data).toEqual(MOCK_DATA); // Assuming MOCK_DATA is defined
+  });
+
+  it('should emit the selected job when selectJob is called', () => {
+    const job: Job = {
+      id: '1',
+      jobTitle: 'Software Engineer',
+      companyName: 'ABC Company',
+      priority: 'High',
+      status: 'Open',
+      source: 'LinkedIn',
+      postingUrl: 'https://example.com',
+      notes: 'Lorem ipsum',
+    };
+    let emittedJob: Job | undefined;
+    component.jobSelected.subscribe((selectedJob: Job) => {
+      emittedJob = selectedJob;
+    });
+    component.selectJob(job);
+    expect(emittedJob).toEqual(job);
   });
 });

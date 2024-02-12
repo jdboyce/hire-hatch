@@ -1,0 +1,37 @@
+<mat-card *ngIf="job">
+  <mat-card-header>
+    <mat-card-title>{{ job.jobTitle }}</mat-card-title>
+  </mat-card-header>
+
+  <div class="card-content-container">
+    <mat-card-content>
+      <p>
+        <strong>Company Name: </strong
+        ><input type="text" value="{{ job.companyName }}" readonly />
+      </p>
+      <p>
+        <strong>Status: </strong
+        ><input type="text" value="{{ job.status }}" readonly />
+      </p>
+      <p>
+        <strong>Posting URL: </strong
+        ><input type="text" value="{{ job.postingUrl }}" readonly />
+      </p>
+    </mat-card-content>
+
+    <mat-card-content>
+      <p>
+        <strong>Priority: </strong
+        ><input type="text" value="{{ job.priority }}" readonly />
+      </p>
+      <p>
+        <strong>Source: </strong
+        ><input type="text" value="{{ job.source }}" readonly />
+      </p>
+      <p>
+        <strong>Notes: </strong
+        ><input type="text" value="{{ job.notes }}" readonly />
+      </p>
+    </mat-card-content>
+  </div>
+</mat-card>

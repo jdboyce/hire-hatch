@@ -1,3 +1,4 @@
 <h1>Hire Hatch</h1>
 
-<app-job-table></app-job-table>
+<app-job-table (jobSelected)="selectedJob = $event"></app-job-table>
+<app-job-detail [job]="selectedJob"></app-job-detail>

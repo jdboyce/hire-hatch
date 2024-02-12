@@ -1,16 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { JobTableComponent } from './components/job-table/job-table.component';
+import { JobDetailComponent } from './components/job-detail/job-detail.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
-      declarations: [
-        AppComponent
-      ],
+      imports: [RouterTestingModule],
+      declarations: [AppComponent, JobTableComponent, JobDetailComponent],
     }).compileComponents();
   });
 
@@ -26,10 +24,9 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('hire-hatch-ui');
   });
 
-  it('should render title', () => {
+  it('should initialize selectedJob as undefined', () => {
     const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('hire-hatch-ui app is running!');
+    const app = fixture.componentInstance;
+    expect(app.selectedJob).toBeUndefined();
   });
 });
