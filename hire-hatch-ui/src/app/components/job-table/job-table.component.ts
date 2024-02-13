@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Job, MOCK_DATA } from 'src/app/models/job.model';
+import { Job } from 'src/app/models/job.model';
+import { JobService } from 'src/app/services/job.service';
 
 @Component({
   selector: 'app-job-table',
@@ -19,11 +19,17 @@ export class JobTableComponent {
     'postingUrl',
     'notes',
   ];
-  dataSource = new MatTableDataSource(MOCK_DATA);
+  jobs!: Job[];
   selectedJob!: Job;
 
-  selectJob(job: Job) {
+  constructor(private jobService: JobService) {}
+
+  ngOnInit(): void {
+    this.jobService.getJobs().subscribe((jobs) => (this.jobs = jobs));
+  }
+
+  selectJob(job: Job): void {
+    this.jobService.selectJob(job);
     this.selectedJob = job;
-    this.jobSelected.emit(job);
   }
 }

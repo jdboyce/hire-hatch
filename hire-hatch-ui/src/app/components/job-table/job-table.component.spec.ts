@@ -1,16 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobTableComponent } from './job-table.component';
 import { MatTableModule } from '@angular/material/table';
-import { MatTableDataSource } from '@angular/material/table';
 import { Job, MOCK_DATA } from 'src/app/models/job.model';
+import { of } from 'rxjs';
+import { JobService } from 'src/app/services/job.service';
 
 describe('JobTableComponent', () => {
   let component: JobTableComponent;
   let fixture: ComponentFixture<JobTableComponent>;
+  let mockJobService = {
+    getJobs: () => of(MOCK_DATA),
+    selectJob: (job: Job) => {},
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [JobTableComponent],
+      providers: [{ provide: JobService, useValue: mockJobService }],
       imports: [MatTableModule],
     }).compileComponents();
   });
@@ -37,27 +43,16 @@ describe('JobTableComponent', () => {
     ]);
   });
 
-  it('should have the correct data source', () => {
-    expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
-    expect(component.dataSource.data).toEqual(MOCK_DATA); // Assuming MOCK_DATA is defined
+  it('#ngOnInit should set jobs', () => {
+    component.ngOnInit();
+    expect(component.jobs).toEqual(MOCK_DATA);
   });
 
-  it('should emit the selected job when selectJob is called', () => {
-    const job: Job = {
-      id: '1',
-      jobTitle: 'Software Engineer',
-      companyName: 'ABC Company',
-      priority: 'High',
-      status: 'Open',
-      source: 'LinkedIn',
-      postingUrl: 'https://example.com',
-      notes: 'Lorem ipsum',
-    };
-    let emittedJob: Job | undefined;
-    component.jobSelected.subscribe((selectedJob: Job) => {
-      emittedJob = selectedJob;
-    });
+  it('#selectJob should set selectedJob and call jobService.selectJob', () => {
+    const job: Job = MOCK_DATA[0];
+    spyOn(mockJobService, 'selectJob');
     component.selectJob(job);
-    expect(emittedJob).toEqual(job);
+    expect(component.selectedJob).toEqual(job);
+    expect(mockJobService.selectJob).toHaveBeenCalledWith(job);
   });
 });

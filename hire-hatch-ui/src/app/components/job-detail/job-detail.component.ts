@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { Job } from 'src/app/models/job.model';
+import { JobService } from 'src/app/services/job.service';
 
 @Component({
   selector: 'app-job-detail',
@@ -7,5 +8,11 @@ import { Job } from 'src/app/models/job.model';
   styleUrls: ['./job-detail.component.scss'],
 })
 export class JobDetailComponent {
-  @Input() job!: Job;
+  selectedJob!: Job;
+
+  constructor(private jobService: JobService) {}
+
+  ngOnInit(): void {
+    this.jobService.selectedJob$.subscribe((job) => (this.selectedJob = job!));
+  }
 }
