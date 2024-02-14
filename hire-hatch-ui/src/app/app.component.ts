@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Job } from './models/job.model';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +7,4 @@ import { Job } from './models/job.model';
 })
 export class AppComponent {
   title = 'hire-hatch-ui';
-  selectedJob!: Job;
 }

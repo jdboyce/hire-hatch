@@ -3,11 +3,12 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { JobTableComponent } from './components/job-table/job-table.component';
 import { JobDetailComponent } from './components/job-detail/job-detail.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       declarations: [AppComponent, JobTableComponent, JobDetailComponent],
     }).compileComponents();
   });
@@ -22,11 +23,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('hire-hatch-ui');
-  });
-
-  it('should initialize selectedJob as undefined', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.selectedJob).toBeUndefined();
   });
 });
