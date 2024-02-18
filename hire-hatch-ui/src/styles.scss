@@ -1,5 +1,75 @@
+@use "@angular/material" as mat;
+
 body {
-    margin: 50px;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    overflow: hidden;
+  margin: 26px 50px 30px 50px;
+}
+
+.job-table {
+  @include mat.table-density(-2);
+}
+
+.job-detail-form {
+  margin: 20px auto 0;
+  padding: 25px 20px 15px 20px;
+
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .input-form-field.mat-mdc-form-field {
+    @include mat.form-field-density(-3);
+  }
+
+  .header-title-input.mat-mdc-card-header {
+    padding: 4px 0 2px;
+    max-height: 100px;
+
+    .mat-mdc-form-field {
+      width: 300px;
+    }
+
+    .mat-mdc-text-field-wrapper.mdc-text-field {
+      input {
+        font-size: 21px;
+        font-weight: bold;
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+
+  .url-field.mat-mdc-form-field {
+    .mat-mdc-form-field-infix {
+      display: inline-flex;
+
+      button {
+        padding: 3px 4px 0 4px;
+      }
+      mat-icon {
+        height: 14px;
+        width: 14px;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .date-picker.mat-mdc-form-field {
+    .mdc-icon-button {
+      padding: 10px;
+    }
+
+    .mat-mdc-icon-button svg,
+    .mat-mdc-icon-button img {
+      width: var(--mdc-icon-button-icon-size, 20px);
+      height: var(--mdc-icon-button-icon-size, 20px);
+    }
+
+    .mat-mdc-icon-button.mat-mdc-button-base {
+      max-height: 44px;
+    }
+  }
 }

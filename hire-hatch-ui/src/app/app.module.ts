@@ -8,6 +8,13 @@ import { MatTableModule } from '@angular/material/table';
 import { JobDetailComponent } from './components/job-detail/job-detail.component';
 import { MatCardModule } from '@angular/material/card';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [AppComponent, JobTableComponent, JobDetailComponent],
@@ -18,6 +25,13 @@ import { HttpClientModule } from '@angular/common/http';
     MatTableModule,
     MatCardModule,
     HttpClientModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

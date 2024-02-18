@@ -15,9 +15,7 @@ export class JobTableComponent {
     'companyName',
     'priority',
     'status',
-    'source',
     'postingUrl',
-    'notes',
   ];
   jobs!: Job[];
   selectedJob!: Job;

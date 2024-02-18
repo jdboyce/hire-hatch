@@ -20,8 +20,13 @@ describe('JobTableComponent', () => {
       companyName: 'Tech Innovations Inc.',
       priority: 'High',
       status: 'Submitted Application',
-      source: 'LinkedIn',
       postingUrl: 'https://www.linkedin.com/jobs/12345',
+      source: 'LinkedIn',
+      salary: '$95,000',
+      type: 'Full-time',
+      location: 'Remote',
+      dateApplied: new Date('2024-02-10T00:00:00-05:00'),
+      followUpDate: new Date('2024-02-23T20:17:38-05:00'),
       notes:
         'Angular-focused team. Values collaboration and continuous learning. Good work-life balance.',
     },
@@ -31,8 +36,13 @@ describe('JobTableComponent', () => {
       companyName: 'Web Wizards Agency',
       priority: 'High',
       status: 'Interviewed',
-      source: 'Glassdoor',
       postingUrl: 'https://www.glassdoor.com/jobs/67890',
+      source: 'Glassdoor',
+      salary: '$90,000',
+      type: 'Full-time',
+      location: 'Office',
+      dateApplied: new Date('2024-02-06T00:00:00-05:00'),
+      followUpDate: undefined,
       notes:
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
@@ -66,9 +76,7 @@ describe('JobTableComponent', () => {
       'companyName',
       'priority',
       'status',
-      'source',
       'postingUrl',
-      'notes',
     ]);
   });
 

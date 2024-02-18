@@ -4,7 +4,12 @@ export interface Job {
   companyName: string;
   priority: string;
   status: string;
-  source: string;
   postingUrl: string;
+  source: string;
+  salary: string;
+  type: string;
+  location: string;
+  dateApplied?: Date;
+  followUpDate?: Date;
   notes: string;
 }

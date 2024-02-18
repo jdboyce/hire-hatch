@@ -2,9 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobDetailComponent } from './job-detail.component';
 import { Job } from 'src/app/models/job.model';
 import { MatCardModule } from '@angular/material/card';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { JobService } from 'src/app/services/job.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 describe('JobDetailComponent', () => {
   let component: JobDetailComponent;
   let fixture: ComponentFixture<JobDetailComponent>;
@@ -16,8 +25,13 @@ describe('JobDetailComponent', () => {
       companyName: 'Tech Innovations Inc.',
       priority: 'High',
       status: 'Submitted Application',
-      source: 'LinkedIn',
       postingUrl: 'https://www.linkedin.com/jobs/12345',
+      source: 'LinkedIn',
+      salary: '$95,000',
+      type: 'Full-time',
+      location: 'Remote',
+      dateApplied: new Date('2024-02-10T00:00:00-05:00'),
+      followUpDate: new Date('2024-02-23T20:17:38-05:00'),
       notes:
         'Angular-focused team. Values collaboration and continuous learning. Good work-life balance.',
     },
@@ -27,8 +41,13 @@ describe('JobDetailComponent', () => {
       companyName: 'Web Wizards Agency',
       priority: 'High',
       status: 'Interviewed',
-      source: 'Glassdoor',
       postingUrl: 'https://www.glassdoor.com/jobs/67890',
+      source: 'Glassdoor',
+      salary: '$90,000',
+      type: 'Full-time',
+      location: 'Office',
+      dateApplied: new Date('2024-02-06T00:00:00-05:00'),
+      followUpDate: undefined,
       notes:
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
@@ -38,7 +57,18 @@ describe('JobDetailComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [JobDetailComponent],
       providers: [JobService],
-      imports: [MatCardModule, HttpClientTestingModule],
+      imports: [
+        MatCardModule,
+        HttpClientTestingModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatIconModule,
+        BrowserAnimationsModule,
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(JobDetailComponent);
@@ -51,26 +81,81 @@ describe('JobDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('#ngOnInit should subscribe to selectedJob$ from JobService', () => {
-    const job: Job = mockJobs[0];
-    jobService.selectedJob$ = of(job);
+  it('should initialize jobForm on ngOnInit', () => {
+    jobService.selectedJob$ = of(null);
     component.ngOnInit();
-    expect(component.selectedJob).toEqual(job);
+    expect(component.jobForm).toBeDefined();
+  });
+
+  it('should patch jobForm values when different jobs are selected', () => {
+    const selectedJobSubject = new Subject<Job>();
+    jobService.selectedJob$ = selectedJobSubject.asObservable();
+    component.ngOnInit();
+    selectedJobSubject.next(mockJobs[0]);
+    expect(component.jobForm.value).toEqual(mockJobs[0]);
+    selectedJobSubject.next(mockJobs[1]);
+    expect(component.jobForm.value).toEqual(mockJobs[1]);
+  });
+
+  it('should reset jobForm when no job is selected', () => {
+    jobService.selectedJob$ = of(null);
+    component.ngOnInit();
+    expect(component.jobForm.value).toEqual({
+      id: null,
+      jobTitle: null,
+      companyName: null,
+      priority: null,
+      status: null,
+      postingUrl: null,
+      source: null,
+      salary: null,
+      type: null,
+      location: null,
+      dateApplied: null,
+      followUpDate: null,
+      notes: null,
+    });
   });
 
   it('should display the job title', () => {
-    component.selectedJob = mockJobs[1];
-    fixture.detectChanges();
-    const jobTitleElement: HTMLElement =
-      fixture.nativeElement.querySelector('mat-card-title');
-    expect(jobTitleElement.textContent).toContain(mockJobs[1].jobTitle);
+    const jobTitleControl = component.jobForm.get('jobTitle');
+    if (jobTitleControl) {
+      jobTitleControl.setValue(mockJobs[1].jobTitle);
+      fixture.detectChanges();
+
+      const jobTitleInput: HTMLInputElement =
+        fixture.nativeElement.querySelector(
+          'input[formControlName="jobTitle"]'
+        );
+      expect(jobTitleInput).toBeTruthy();
+      expect(jobTitleInput.value).toBe(mockJobs[1].jobTitle);
+    } else {
+      fail('Job title control does not exist');
+    }
   });
 
   it('should display the company name', () => {
-    component.selectedJob = mockJobs[0];
-    fixture.detectChanges();
-    const companyNameElement: HTMLInputElement =
-      fixture.nativeElement.querySelector('input[type="text"]');
-    expect(companyNameElement.value).toContain(mockJobs[0].companyName);
+    const companyNameControl = component.jobForm.get('companyName');
+    if (companyNameControl) {
+      companyNameControl.setValue(mockJobs[0].companyName);
+      fixture.detectChanges();
+
+      const companyNameInput: HTMLInputElement =
+        fixture.nativeElement.querySelector(
+          'input[formControlName="companyName"]'
+        );
+      expect(companyNameInput).toBeTruthy();
+      expect(companyNameInput.value).toBe(mockJobs[0].companyName);
+    } else {
+      fail('Company name control does not exist');
+    }
+  });
+
+  it('should open a new window with the postingUrl when openUrl is called', () => {
+    const url = 'http://example.com';
+    spyOn(window, 'open');
+    component.jobForm.get('postingUrl')?.setValue(url);
+    component.openUrl();
+    expect(window.open).toHaveBeenCalledWith(url, '_blank');
   });
 });
