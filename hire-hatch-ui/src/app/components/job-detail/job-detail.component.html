@@ -48,7 +48,7 @@
       >
         <mat-label>Posting URL</mat-label>
         <input matInput formControlName="postingUrl" />
-        <button mat-icon-button (click)="openUrl()">
+        <button mat-flat-button (click)="openUrl()">
           <mat-icon>open_in_new</mat-icon>
         </button>
       </mat-form-field>
@@ -129,11 +129,24 @@
     <div class="card-flex-items-container">
       <mat-form-field
         appearance="outline"
-        class="flex-item-full-width input-form-field"
+        class="flex-item-large input-form-field"
       >
         <mat-label>Notes</mat-label>
         <input matInput formControlName="notes" />
       </mat-form-field>
+      <div class="flex-item-extra-small">
+        <app-action-button
+          [type]="'button'"
+          [icon]="'save'"
+          [label]="'Save'"
+          class="left-action-button"
+        ></app-action-button>
+        <app-action-button
+          [type]="'button'"
+          [icon]="'cancel'"
+          [label]="'Cancel'"
+        ></app-action-button>
+      </div>
     </div>
   </form>
 </mat-card>

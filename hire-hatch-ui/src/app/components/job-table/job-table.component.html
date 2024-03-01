@@ -1,4 +1,17 @@
 <div class="job-table">
+  <div class="table-actions">
+    <app-action-button
+      [type]="'button'"
+      [icon]="'add_circle'"
+      [label]="'Add'"
+      class="left-action-button"
+    ></app-action-button>
+    <app-action-button
+      [type]="'button'"
+      [icon]="'remove_circle'"
+      [label]="'Remove'"
+    ></app-action-button>
+  </div>
   <table mat-table [dataSource]="jobs">
     <ng-container matColumnDef="jobTitle">
       <th mat-header-cell *matHeaderCellDef>Job Title</th>

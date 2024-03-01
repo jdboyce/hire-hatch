@@ -4,12 +4,18 @@ import { AppComponent } from './app.component';
 import { JobTableComponent } from './components/job-table/job-table.component';
 import { JobDetailComponent } from './components/job-detail/job-detail.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActionButtonComponent } from './shared/action-button/action-button.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule, HttpClientTestingModule],
-      declarations: [AppComponent, JobTableComponent, JobDetailComponent],
+      declarations: [
+        AppComponent,
+        JobTableComponent,
+        JobDetailComponent,
+        ActionButtonComponent,
+      ],
     }).compileComponents();
   });
 

@@ -15,9 +15,16 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { ActionButtonComponent } from './shared/action-button/action-button.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
-  declarations: [AppComponent, JobTableComponent, JobDetailComponent],
+  declarations: [
+    AppComponent,
+    JobTableComponent,
+    JobDetailComponent,
+    ActionButtonComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -32,6 +39,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule,
+    MatButtonModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -9,6 +9,9 @@ import { MatTableModule } from '@angular/material/table';
 import { Job } from 'src/app/models/job.model';
 import { of } from 'rxjs';
 import { JobService } from 'src/app/services/job.service';
+import { ActionButtonComponent } from 'src/app/shared/action-button/action-button.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 describe('JobTableComponent', () => {
   let component: JobTableComponent;
@@ -54,9 +57,9 @@ describe('JobTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [JobTableComponent],
+      declarations: [JobTableComponent, ActionButtonComponent],
       providers: [{ provide: JobService, useValue: mockJobService }],
-      imports: [MatTableModule],
+      imports: [MatTableModule, MatIconModule, MatButtonModule],
     }).compileComponents();
   });
 

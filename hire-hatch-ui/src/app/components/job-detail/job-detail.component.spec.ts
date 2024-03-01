@@ -13,6 +13,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ActionButtonComponent } from 'src/app/shared/action-button/action-button.component';
+import { MatButtonModule } from '@angular/material/button';
 
 describe('JobDetailComponent', () => {
   let component: JobDetailComponent;
@@ -55,7 +57,7 @@ describe('JobDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [JobDetailComponent],
+      declarations: [JobDetailComponent, ActionButtonComponent],
       providers: [JobService],
       imports: [
         MatCardModule,
@@ -68,6 +70,7 @@ describe('JobDetailComponent', () => {
         MatNativeDateModule,
         MatIconModule,
         BrowserAnimationsModule,
+        MatButtonModule,
       ],
     }).compileComponents();
 

@@ -8,6 +8,11 @@ $flex-item-margin: 10px;
   flex-wrap: wrap;
 }
 
+.flex-item-extra-small {
+  flex: 0.5565;
+  margin: $flex-item-margin;
+}
+
 .flex-item-small {
   flex: 1;
   margin: $flex-item-margin;
@@ -20,10 +25,5 @@ $flex-item-margin: 10px;
 
 .flex-item-large {
   flex: 3;
-  margin: $flex-item-margin;
-}
-
-.flex-item-full-width {
-  width: 100%;
   margin: $flex-item-margin;
 }
