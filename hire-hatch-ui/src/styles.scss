@@ -92,3 +92,11 @@ body {
 .left-action-button .mdc-button.mat-mdc-unelevated-button {
   margin-right: 12px;
 }
+
+.success-snackbar.mdc-snackbar .mdc-snackbar__surface {
+  background-color: #2b8d42b2;
+}
+
+.error-snackbar.mdc-snackbar .mdc-snackbar__surface {
+  background-color: #bc4a568e;
+}

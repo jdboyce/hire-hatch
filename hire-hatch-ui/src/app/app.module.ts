@@ -17,6 +17,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ActionButtonComponent } from './shared/action-button/action-button.component';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +27,7 @@ import { MatButtonModule } from '@angular/material/button';
     JobTableComponent,
     JobDetailComponent,
     ActionButtonComponent,
+    ConfirmationDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,6 +44,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatNativeDateModule,
     MatIconModule,
     MatButtonModule,
+    MatSnackBarModule,
+    MatDialogModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
