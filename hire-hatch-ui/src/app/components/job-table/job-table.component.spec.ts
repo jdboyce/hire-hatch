@@ -7,11 +7,13 @@ import {
 import { JobTableComponent } from './job-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { Job } from 'src/app/models/job.model';
-import { of } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { JobService } from 'src/app/services/job.service';
 import { ActionButtonComponent } from 'src/app/shared/action-button/action-button.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
 
 describe('JobTableComponent', () => {
   let component: JobTableComponent;
@@ -53,13 +55,22 @@ describe('JobTableComponent', () => {
   let mockJobService = {
     getJobs: () => of(mockJobs),
     selectJob: (job: Job) => {},
+    jobs$: of(mockJobs),
+    selectedJob$: of(mockJobs[0]),
+    loadData: () => {},
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [JobTableComponent, ActionButtonComponent],
       providers: [{ provide: JobService, useValue: mockJobService }],
-      imports: [MatTableModule, MatIconModule, MatButtonModule],
+      imports: [
+        MatTableModule,
+        MatIconModule,
+        MatButtonModule,
+        MatSnackBarModule,
+        MatDialogModule,
+      ],
     }).compileComponents();
   });
 
@@ -69,32 +80,67 @@ describe('JobTableComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
+  describe('component setup', () => {
+    it('should create the component', () => {
+      expect(component).toBeTruthy();
+    });
+
+    it('should have the correct displayed columns', () => {
+      expect(component.displayedColumns).toEqual([
+        'jobTitle',
+        'companyName',
+        'priority',
+        'status',
+        'postingUrl',
+      ]);
+    });
   });
 
-  it('should have the correct displayed columns', () => {
-    expect(component.displayedColumns).toEqual([
-      'jobTitle',
-      'companyName',
-      'priority',
-      'status',
-      'postingUrl',
-    ]);
+  describe('ngOnInit', () => {
+    it('should create subscriptions in ngOnInit', () => {
+      const jobsSubscription = new Subscription();
+      const selectedJobSubscription = new Subscription();
+      spyOn(mockJobService.jobs$, 'subscribe').and.returnValue(
+        jobsSubscription
+      );
+      spyOn(mockJobService.selectedJob$, 'subscribe').and.returnValue(
+        selectedJobSubscription
+      );
+      spyOn(mockJobService, 'loadData');
+
+      component.ngOnInit();
+
+      expect((component as any).jobsSubscription).toBe(jobsSubscription);
+      expect((component as any).selectedJobSubscription).toBe(
+        selectedJobSubscription
+      );
+      expect(mockJobService.loadData).toHaveBeenCalled();
+    });
   });
 
-  it('#ngOnInit should set jobs', fakeAsync(() => {
-    spyOn(mockJobService, 'getJobs').and.returnValue(of(mockJobs));
-    component.ngOnInit();
-    tick();
-    expect(component.jobs).toEqual(mockJobs);
-  }));
+  describe('ngOnDestroy', () => {
+    it('should unsubscribe in ngOnDestroy', () => {
+      const jobsSubscription = new Subscription();
+      const selectedJobSubscription = new Subscription();
+      spyOn(jobsSubscription, 'unsubscribe');
+      spyOn(selectedJobSubscription, 'unsubscribe');
+      component['jobsSubscription'] = jobsSubscription;
+      component['selectedJobSubscription'] = selectedJobSubscription;
 
-  it('#selectJob should set selectedJob and call jobService.selectJob', () => {
-    const job: Job = mockJobs[0];
-    spyOn(mockJobService, 'selectJob');
-    component.selectJob(job);
-    expect(component.selectedJob).toEqual(job);
-    expect(mockJobService.selectJob).toHaveBeenCalledWith(job);
+      component.ngOnDestroy();
+
+      expect(jobsSubscription.unsubscribe).toHaveBeenCalled();
+      expect(selectedJobSubscription.unsubscribe).toHaveBeenCalled();
+    });
+  });
+
+  describe('selectJob', () => {
+    it('should set selectedJob and call jobService.selectJob', () => {
+      const job: Job = mockJobs[0];
+      spyOn(mockJobService, 'selectJob');
+      component.selectJob(job);
+      expect(component.selectedJob).toEqual(job);
+      expect(mockJobService.selectJob).toHaveBeenCalledWith(job);
+    });
   });
 });

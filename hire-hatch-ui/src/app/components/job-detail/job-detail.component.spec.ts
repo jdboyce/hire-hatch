@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobDetailComponent } from './job-detail.component';
 import { Job } from 'src/app/models/job.model';
 import { MatCardModule } from '@angular/material/card';
-import { Subject, of } from 'rxjs';
+import { Subject, Subscription, of, throwError } from 'rxjs';
 import { JobService } from 'src/app/services/job.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -15,11 +15,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActionButtonComponent } from 'src/app/shared/action-button/action-button.component';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { NotificationService } from 'src/app/services/notification.service';
 
 describe('JobDetailComponent', () => {
   let component: JobDetailComponent;
   let fixture: ComponentFixture<JobDetailComponent>;
-  let jobService: JobService;
   let mockJobs: Job[] = [
     {
       id: '3107346e-69ca-4559-bf77-36ff01cfed22',
@@ -54,11 +56,28 @@ describe('JobDetailComponent', () => {
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
   ];
+  let mockJobService: jasmine.SpyObj<JobService>;
+  let mockNotificationService: jasmine.SpyObj<NotificationService>;
+  let mockSelectedJobSubscription: jasmine.SpyObj<Subscription>;
 
   beforeEach(async () => {
+    const selectedJobSubject = new Subject<Job>();
+    mockJobService = jasmine.createSpyObj('JobService', ['getJobs', 'saveJob']);
+    mockJobService.selectedJob$ = selectedJobSubject.asObservable();
+    mockNotificationService = jasmine.createSpyObj('NotificationService', [
+      'showSuccess',
+      'showError',
+    ]);
+
     await TestBed.configureTestingModule({
       declarations: [JobDetailComponent, ActionButtonComponent],
-      providers: [JobService],
+      providers: [
+        { provide: JobService, useValue: mockJobService },
+        {
+          provide: NotificationService,
+          useValue: mockNotificationService,
+        },
+      ],
       imports: [
         MatCardModule,
         HttpClientTestingModule,
@@ -71,94 +90,200 @@ describe('JobDetailComponent', () => {
         MatIconModule,
         BrowserAnimationsModule,
         MatButtonModule,
+        MatSnackBarModule,
+        MatDialogModule,
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(JobDetailComponent);
     component = fixture.componentInstance;
-    jobService = TestBed.inject(JobService);
+    mockJobService.getJobs.and.returnValue(of([mockJobs[0]]));
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
-  });
+  describe('component setup', () => {
+    it('should create the component', () => {
+      expect(component).toBeTruthy();
+    });
 
-  it('should initialize jobForm on ngOnInit', () => {
-    jobService.selectedJob$ = of(null);
-    component.ngOnInit();
-    expect(component.jobForm).toBeDefined();
-  });
+    it('should display the job title', () => {
+      const jobTitleControl = component.jobForm.get('jobTitle');
+      if (jobTitleControl) {
+        jobTitleControl.setValue(mockJobs[1].jobTitle);
+        fixture.detectChanges();
 
-  it('should patch jobForm values when different jobs are selected', () => {
-    const selectedJobSubject = new Subject<Job>();
-    jobService.selectedJob$ = selectedJobSubject.asObservable();
-    component.ngOnInit();
-    selectedJobSubject.next(mockJobs[0]);
-    expect(component.jobForm.value).toEqual(mockJobs[0]);
-    selectedJobSubject.next(mockJobs[1]);
-    expect(component.jobForm.value).toEqual(mockJobs[1]);
-  });
+        const jobTitleInput: HTMLInputElement =
+          fixture.nativeElement.querySelector(
+            'input[formControlName="jobTitle"]'
+          );
+        expect(jobTitleInput).toBeTruthy();
+        expect(jobTitleInput.value).toBe(mockJobs[1].jobTitle);
+      } else {
+        fail('Job title control does not exist');
+      }
+    });
 
-  it('should reset jobForm when no job is selected', () => {
-    jobService.selectedJob$ = of(null);
-    component.ngOnInit();
-    expect(component.jobForm.value).toEqual({
-      id: null,
-      jobTitle: null,
-      companyName: null,
-      priority: null,
-      status: null,
-      postingUrl: null,
-      source: null,
-      salary: null,
-      type: null,
-      location: null,
-      dateApplied: null,
-      followUpDate: null,
-      notes: null,
+    it('should display the company name', () => {
+      const companyNameControl = component.jobForm.get('companyName');
+      if (companyNameControl) {
+        companyNameControl.setValue(mockJobs[0].companyName);
+        fixture.detectChanges();
+
+        const companyNameInput: HTMLInputElement =
+          fixture.nativeElement.querySelector(
+            'input[formControlName="companyName"]'
+          );
+        expect(companyNameInput).toBeTruthy();
+        expect(companyNameInput.value).toBe(mockJobs[0].companyName);
+      } else {
+        fail('Company name control does not exist');
+      }
     });
   });
 
-  it('should display the job title', () => {
-    const jobTitleControl = component.jobForm.get('jobTitle');
-    if (jobTitleControl) {
-      jobTitleControl.setValue(mockJobs[1].jobTitle);
-      fixture.detectChanges();
+  describe('ngOnInit', () => {
+    it('should initialize jobForm on ngOnInit', () => {
+      const selectedJobSubject = new Subject<Job>();
+      mockJobService.selectedJob$ = selectedJobSubject.asObservable();
+      mockJobService.selectedJob$ = of(null);
+      component.ngOnInit();
+      expect(component.jobForm).toBeDefined();
+    });
 
-      const jobTitleInput: HTMLInputElement =
-        fixture.nativeElement.querySelector(
-          'input[formControlName="jobTitle"]'
-        );
-      expect(jobTitleInput).toBeTruthy();
-      expect(jobTitleInput.value).toBe(mockJobs[1].jobTitle);
-    } else {
-      fail('Job title control does not exist');
-    }
+    it('should update jobForm values when different jobs are selected', () => {
+      const selectedJobSubject = new Subject<Job>();
+      mockJobService.selectedJob$ = selectedJobSubject.asObservable();
+      component.ngOnInit();
+      selectedJobSubject.next(mockJobs[0]);
+      expect(component.jobForm.value).toEqual(mockJobs[0]);
+      selectedJobSubject.next(mockJobs[1]);
+      expect(component.jobForm.value).toEqual({
+        ...mockJobs[1],
+        followUpDate: mockJobs[1].followUpDate || null,
+      });
+    });
+
+    it('should reset jobForm when no job is selected', () => {
+      mockJobService.selectedJob$ = of(null);
+      component.ngOnInit();
+      expect(component.jobForm.value).toEqual({
+        id: null,
+        jobTitle: null,
+        companyName: null,
+        priority: null,
+        status: null,
+        postingUrl: null,
+        source: null,
+        salary: null,
+        type: null,
+        location: null,
+        dateApplied: null,
+        followUpDate: null,
+        notes: null,
+      });
+    });
   });
 
-  it('should display the company name', () => {
-    const companyNameControl = component.jobForm.get('companyName');
-    if (companyNameControl) {
-      companyNameControl.setValue(mockJobs[0].companyName);
-      fixture.detectChanges();
+  describe('ngOnDestroy', () => {
+    it('should unsubscribe from selectedJobSubscription', () => {
+      mockSelectedJobSubscription = jasmine.createSpyObj('Subscription', [
+        'unsubscribe',
+      ]);
+      component.selectedJobSubscription = mockSelectedJobSubscription;
+      component.ngOnDestroy();
+      expect(mockSelectedJobSubscription.unsubscribe).toHaveBeenCalled();
+    });
 
-      const companyNameInput: HTMLInputElement =
-        fixture.nativeElement.querySelector(
-          'input[formControlName="companyName"]'
-        );
-      expect(companyNameInput).toBeTruthy();
-      expect(companyNameInput.value).toBe(mockJobs[0].companyName);
-    } else {
-      fail('Company name control does not exist');
-    }
+    it('should not throw an error if selectedJobSubscription is null', () => {
+      component.selectedJobSubscription = undefined;
+      expect(() => component.ngOnDestroy()).not.toThrow();
+    });
   });
 
-  it('should open a new window with the postingUrl when openUrl is called', () => {
-    const url = 'http://example.com';
-    spyOn(window, 'open');
-    component.jobForm.get('postingUrl')?.setValue(url);
-    component.openUrl();
-    expect(window.open).toHaveBeenCalledWith(url, '_blank');
+  describe('openUrl', () => {
+    it('should open a new window with the postingUrl when openUrl is called', () => {
+      const url = 'http://example.com';
+      spyOn(window, 'open');
+      component.jobForm.get('postingUrl')?.setValue(url);
+      component.openUrl();
+      expect(window.open).toHaveBeenCalledWith(url, '_blank');
+    });
+  });
+
+  describe('saveJob', () => {
+    it('should call jobService.saveJob if the form is dirty and valid', () => {
+      const job = mockJobs[0];
+      component.jobForm.setValue(job);
+      component.jobForm.markAsDirty();
+      mockJobService.saveJob.and.returnValue(of(job));
+
+      component.saveJob();
+
+      expect(mockJobService.saveJob).toHaveBeenCalledWith(job);
+    });
+
+    it('should not call jobService.saveJob if the form is not dirty', () => {
+      const job = mockJobs[0];
+      component.jobForm.setValue(job);
+      component.jobForm.markAsPristine();
+      mockJobService.saveJob.and.returnValue(of(job));
+
+      component.saveJob();
+
+      expect(mockJobService.saveJob).not.toHaveBeenCalled();
+    });
+
+    it('should not call jobService.saveJob if the form is not valid', () => {
+      const job = mockJobs[0];
+      component.jobForm.setValue(job);
+      component.jobForm.markAsDirty();
+      component.jobForm.setErrors({ invalid: true });
+      mockJobService.saveJob.and.returnValue(of(job));
+
+      component.saveJob();
+
+      expect(mockJobService.saveJob).not.toHaveBeenCalled();
+    });
+
+    it('should show a success notification and reset the form on success', () => {
+      const job = mockJobs[0];
+      component.jobForm.setValue(job);
+      component.jobForm.markAsDirty();
+      mockJobService.saveJob.and.returnValue(of(job));
+      spyOn(component.jobForm, 'reset');
+
+      component.saveJob();
+
+      expect(mockNotificationService.showSuccess).toHaveBeenCalledWith(
+        'Job saved successfully!'
+      );
+      expect(component.jobForm.reset).toHaveBeenCalled();
+    });
+
+    it('should show an error notification on error', () => {
+      const job = mockJobs[0];
+      component.jobForm.setValue(job);
+      component.jobForm.markAsDirty();
+      const error = new Error('Test error');
+      mockJobService.saveJob.and.returnValue(throwError(() => error));
+
+      component.saveJob();
+
+      expect(mockNotificationService.showError).toHaveBeenCalledWith(
+        'An error occurred while saving the job: ' + error.message
+      );
+    });
+  });
+
+  describe('cancel', () => {
+    it('should reset the form to the original job data', () => {
+      const job = mockJobs[0];
+      component.originalJobData = job;
+      spyOn(component.jobForm, 'reset');
+
+      component.cancel();
+
+      expect(component.jobForm.reset).toHaveBeenCalledWith(job);
+    });
   });
 });

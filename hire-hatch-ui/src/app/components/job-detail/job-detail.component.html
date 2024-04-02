@@ -136,15 +136,19 @@
       </mat-form-field>
       <div class="flex-item-extra-small">
         <app-action-button
+          [label]="'Save'"
+          [action]="saveJob"
+          [disabled]="!this.jobForm.dirty || !this.jobForm.valid"
           [type]="'button'"
           [icon]="'save'"
-          [label]="'Save'"
           class="left-action-button"
         ></app-action-button>
         <app-action-button
+          [label]="'Cancel'"
+          [action]="cancel"
+          [disabled]="!this.jobForm.dirty"
           [type]="'button'"
           [icon]="'cancel'"
-          [label]="'Cancel'"
         ></app-action-button>
       </div>
     </div>

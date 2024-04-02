@@ -5,11 +5,18 @@ import { JobTableComponent } from './components/job-table/job-table.component';
 import { JobDetailComponent } from './components/job-detail/job-detail.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActionButtonComponent } from './shared/action-button/action-button.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HttpClientTestingModule],
+      imports: [
+        RouterTestingModule,
+        HttpClientTestingModule,
+        MatSnackBarModule,
+        MatDialogModule,
+      ],
       declarations: [
         AppComponent,
         JobTableComponent,

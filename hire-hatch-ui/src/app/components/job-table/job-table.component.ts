@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Job } from 'src/app/models/job.model';
 import { JobService } from 'src/app/services/job.service';
 
@@ -7,7 +14,7 @@ import { JobService } from 'src/app/services/job.service';
   templateUrl: './job-table.component.html',
   styleUrls: ['./job-table.component.scss'],
 })
-export class JobTableComponent {
+export class JobTableComponent implements OnInit, OnDestroy {
   @Output() jobSelected = new EventEmitter<Job>();
 
   displayedColumns: string[] = [
@@ -19,11 +26,32 @@ export class JobTableComponent {
   ];
   jobs!: Job[];
   selectedJob!: Job;
+  private jobsSubscription?: Subscription;
+  private selectedJobSubscription?: Subscription;
 
   constructor(private jobService: JobService) {}
 
   ngOnInit(): void {
-    this.jobService.getJobs().subscribe((jobs) => (this.jobs = jobs));
+    this.jobsSubscription = this.jobService.jobs$.subscribe(
+      (jobs) => (this.jobs = jobs)
+    );
+    this.selectedJobSubscription = this.jobService.selectedJob$.subscribe(
+      (selectedJob) => {
+        if (selectedJob) {
+          this.selectedJob = selectedJob;
+        }
+      }
+    );
+    this.jobService.loadData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.jobsSubscription) {
+      this.jobsSubscription.unsubscribe();
+    }
+    if (this.selectedJobSubscription) {
+      this.selectedJobSubscription.unsubscribe();
+    }
   }
 
   selectJob(job: Job): void {

@@ -1,14 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { JobService } from 'src/app/services/job.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NotificationService } from 'src/app/services/notification.service';
+import { Job } from 'src/app/models/job.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-job-detail',
   templateUrl: './job-detail.component.html',
   styleUrls: ['./job-detail.component.scss'],
 })
-export class JobDetailComponent {
+export class JobDetailComponent implements OnInit, OnDestroy {
   jobForm!: FormGroup;
+  originalJobData: Job | undefined;
+  selectedJobSubscription?: Subscription;
   // TODO: Remove hardcoded dropdown options and fetch from server instead.
   types = ['Full-time', 'Contract', 'Part-time'];
   priorities = ['High', 'Medium', 'Low'];
@@ -24,7 +29,11 @@ export class JobDetailComponent {
     'Offer Accepted',
   ];
 
-  constructor(private jobService: JobService, private fb: FormBuilder) {}
+  constructor(
+    private jobService: JobService,
+    private notificationService: NotificationService,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     this.jobForm = this.fb.group({
@@ -43,23 +52,53 @@ export class JobDetailComponent {
       notes: [''],
     });
 
-    this.jobService.selectedJob$.subscribe((job) => {
-      if (job) {
-        // TODO: Move date conversion logic to JobService.
-        if (job.dateApplied) {
-          job.dateApplied = new Date(job.dateApplied);
+    this.selectedJobSubscription = this.jobService.selectedJob$.subscribe(
+      (job) => {
+        if (job) {
+          // TODO: Move date conversion logic to JobService.
+          if (job.dateApplied) {
+            job.dateApplied = new Date(job.dateApplied);
+          }
+          if (job.followUpDate) {
+            job.followUpDate = new Date(job.followUpDate);
+          }
+          this.originalJobData = { ...job };
+          this.jobForm.reset(job);
+        } else {
+          this.jobForm.reset();
         }
-        if (job.followUpDate) {
-          job.followUpDate = new Date(job.followUpDate);
-        }
-        this.jobForm.patchValue(job);
-      } else {
-        this.jobForm.reset();
       }
-    });
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.selectedJobSubscription) {
+      this.selectedJobSubscription.unsubscribe();
+    }
   }
 
   openUrl() {
     window.open(this.jobForm.get('postingUrl')?.value, '_blank');
   }
+
+  saveJob = () => {
+    if (this.jobForm.dirty && this.jobForm.valid) {
+      const job = this.jobForm.value;
+      this.jobService.saveJob(job).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Job saved successfully!');
+          this.jobForm.reset();
+        },
+        error: (error) => {
+          this.notificationService.showError(
+            'An error occurred while saving the job: ' + error.message
+          );
+        },
+      });
+    }
+  };
+
+  cancel = () => {
+    this.jobForm.reset(this.originalJobData);
+  };
 }
