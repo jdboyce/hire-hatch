@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobTableComponent } from './job-table.component';
 import { MatTableModule } from '@angular/material/table';
 import { Job } from 'src/app/models/job.model';
@@ -16,9 +11,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 
 describe('JobTableComponent', () => {
-  let component: JobTableComponent;
-  let fixture: ComponentFixture<JobTableComponent>;
-  let mockJobs: Job[] = [
+  const mockJobs: Job[] = [
     {
       id: '3107346e-69ca-4559-bf77-36ff01cfed22',
       jobTitle: 'Frontend Developer',
@@ -52,12 +45,17 @@ describe('JobTableComponent', () => {
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
   ];
+
+  let component: JobTableComponent;
+  let fixture: ComponentFixture<JobTableComponent>;
   let mockJobService = {
     getJobs: () => of(mockJobs),
     selectJob: (job: Job) => {},
     jobs$: of(mockJobs),
     selectedJob$: of(mockJobs[0]),
     loadData: () => {},
+    addJob: () => {},
+    deleteJob: () => {},
   };
 
   beforeEach(async () => {
@@ -97,24 +95,32 @@ describe('JobTableComponent', () => {
   });
 
   describe('ngOnInit', () => {
-    it('should create subscriptions in ngOnInit', () => {
-      const jobsSubscription = new Subscription();
-      const selectedJobSubscription = new Subscription();
-      spyOn(mockJobService.jobs$, 'subscribe').and.returnValue(
-        jobsSubscription
-      );
-      spyOn(mockJobService.selectedJob$, 'subscribe').and.returnValue(
-        selectedJobSubscription
-      );
-      spyOn(mockJobService, 'loadData');
+    it('should update jobs when jobs$ emits', () => {
+      const jobs = mockJobs;
+      mockJobService.jobs$ = of(jobs);
 
       component.ngOnInit();
 
-      expect((component as any).jobsSubscription).toBe(jobsSubscription);
-      expect((component as any).selectedJobSubscription).toBe(
-        selectedJobSubscription
-      );
-      expect(mockJobService.loadData).toHaveBeenCalled();
+      expect(component.jobs).toBe(jobs);
+    });
+
+    it('should update selectedJob and newJobSelected when selectedJob$ emits', () => {
+      const selectedJob = mockJobs[0];
+      mockJobService.selectedJob$ = of(selectedJob);
+
+      component.ngOnInit();
+
+      expect(component.selectedJob).toBe(selectedJob);
+      expect(component.newJobSelected).toBe(!selectedJob.id);
+    });
+
+    it('should set selectedJob to undefined and newJobSelected to false when selectedJob$ emits null', () => {
+      mockJobService.selectedJob$ = of(null as unknown as Job);
+
+      component.ngOnInit();
+
+      expect(component.selectedJob).toBeUndefined();
+      expect(component.newJobSelected).toBe(false);
     });
   });
 
@@ -141,6 +147,26 @@ describe('JobTableComponent', () => {
       component.selectJob(job);
       expect(component.selectedJob).toEqual(job);
       expect(mockJobService.selectJob).toHaveBeenCalledWith(job);
+    });
+  });
+
+  describe('addJob', () => {
+    it('should call jobService.addJob', () => {
+      spyOn(mockJobService, 'addJob');
+
+      component.addJob();
+
+      expect(mockJobService.addJob).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteJob', () => {
+    it('should call jobService.deleteJob', () => {
+      spyOn(mockJobService, 'deleteJob');
+
+      component.deleteJob();
+
+      expect(mockJobService.deleteJob).toHaveBeenCalled();
     });
   });
 });

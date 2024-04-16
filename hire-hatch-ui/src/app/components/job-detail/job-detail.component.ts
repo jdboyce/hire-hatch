@@ -14,6 +14,8 @@ export class JobDetailComponent implements OnInit, OnDestroy {
   jobForm!: FormGroup;
   originalJobData: Job | undefined;
   selectedJobSubscription?: Subscription;
+  newJobSelected = false;
+
   // TODO: Remove hardcoded dropdown options and fetch from server instead.
   types = ['Full-time', 'Contract', 'Part-time'];
   priorities = ['High', 'Medium', 'Low'];
@@ -37,7 +39,6 @@ export class JobDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.jobForm = this.fb.group({
-      id: [''],
       jobTitle: ['', Validators.required],
       companyName: ['', Validators.required],
       priority: [''],
@@ -53,19 +54,21 @@ export class JobDetailComponent implements OnInit, OnDestroy {
     });
 
     this.selectedJobSubscription = this.jobService.selectedJob$.subscribe(
-      (job) => {
-        if (job) {
+      (selectedJob) => {
+        if (selectedJob) {
           // TODO: Move date conversion logic to JobService.
-          if (job.dateApplied) {
-            job.dateApplied = new Date(job.dateApplied);
+          if (selectedJob.dateApplied) {
+            selectedJob.dateApplied = new Date(selectedJob.dateApplied);
           }
-          if (job.followUpDate) {
-            job.followUpDate = new Date(job.followUpDate);
+          if (selectedJob.followUpDate) {
+            selectedJob.followUpDate = new Date(selectedJob.followUpDate);
           }
-          this.originalJobData = { ...job };
-          this.jobForm.reset(job);
+          this.originalJobData = { ...selectedJob };
+          this.newJobSelected = !selectedJob.id;
+          this.jobForm.reset(selectedJob);
         } else {
           this.jobForm.reset();
+          this.newJobSelected = false;
         }
       }
     );
@@ -81,9 +84,12 @@ export class JobDetailComponent implements OnInit, OnDestroy {
     window.open(this.jobForm.get('postingUrl')?.value, '_blank');
   }
 
-  saveJob = () => {
+  saveJob = (): void => {
     if (this.jobForm.dirty && this.jobForm.valid) {
-      const job = this.jobForm.value;
+      let job = this.jobForm.value;
+      if (!this.newJobSelected) {
+        job = { id: this.originalJobData?.id, ...this.jobForm.value };
+      }
       this.jobService.saveJob(job).subscribe({
         next: () => {
           this.notificationService.showSuccess('Job saved successfully!');
@@ -98,7 +104,12 @@ export class JobDetailComponent implements OnInit, OnDestroy {
     }
   };
 
-  cancel = () => {
-    this.jobForm.reset(this.originalJobData);
+  cancel = (): void => {
+    if (this.newJobSelected) {
+      this.jobForm.reset();
+      this.jobService.discardNewJob();
+    } else {
+      this.jobForm.reset(this.originalJobData);
+    }
   };
 }

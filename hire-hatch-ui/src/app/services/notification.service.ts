@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../shared/confirmation-dialog/confirmation-dialog.component';
+import { Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -23,15 +24,11 @@ export class NotificationService {
     });
   }
 
-  showConfirmation(message: string, confirmCallback: () => void) {
+  showConfirmation(message: string): Observable<boolean> {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: { message: message },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        confirmCallback();
-      }
-    });
+    return dialogRef.afterClosed().pipe(map((result) => !!result));
   }
 }

@@ -18,11 +18,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from 'src/app/services/notification.service';
+import * as _ from 'lodash';
 
 describe('JobDetailComponent', () => {
-  let component: JobDetailComponent;
-  let fixture: ComponentFixture<JobDetailComponent>;
-  let mockJobs: Job[] = [
+  const mockJobs: Job[] = [
     {
       id: '3107346e-69ca-4559-bf77-36ff01cfed22',
       jobTitle: 'Frontend Developer',
@@ -56,13 +55,20 @@ describe('JobDetailComponent', () => {
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
   ];
+
+  let component: JobDetailComponent;
+  let fixture: ComponentFixture<JobDetailComponent>;
   let mockJobService: jasmine.SpyObj<JobService>;
   let mockNotificationService: jasmine.SpyObj<NotificationService>;
   let mockSelectedJobSubscription: jasmine.SpyObj<Subscription>;
 
   beforeEach(async () => {
     const selectedJobSubject = new Subject<Job>();
-    mockJobService = jasmine.createSpyObj('JobService', ['getJobs', 'saveJob']);
+    mockJobService = jasmine.createSpyObj('JobService', [
+      'getJobs',
+      'saveJob',
+      'discardNewJob',
+    ]);
     mockJobService.selectedJob$ = selectedJobSubject.asObservable();
     mockNotificationService = jasmine.createSpyObj('NotificationService', [
       'showSuccess',
@@ -150,24 +156,30 @@ describe('JobDetailComponent', () => {
       expect(component.jobForm).toBeDefined();
     });
 
-    it('should update jobForm values when different jobs are selected', () => {
+    it('should update jobForm values and set newJobSelected when different jobs are selected', () => {
       const selectedJobSubject = new Subject<Job>();
       mockJobService.selectedJob$ = selectedJobSubject.asObservable();
       component.ngOnInit();
       selectedJobSubject.next(mockJobs[0]);
-      expect(component.jobForm.value).toEqual(mockJobs[0]);
+      expect(component.jobForm.value).toEqual(_.omit(mockJobs[0], 'id'));
+      expect(component.newJobSelected).toBe(!mockJobs[0].id);
       selectedJobSubject.next(mockJobs[1]);
-      expect(component.jobForm.value).toEqual({
-        ...mockJobs[1],
-        followUpDate: mockJobs[1].followUpDate || null,
-      });
+      expect(component.jobForm.value).toEqual(
+        _.omit(
+          {
+            ...mockJobs[1],
+            followUpDate: mockJobs[1].followUpDate || null,
+          },
+          'id'
+        )
+      );
+      expect(component.newJobSelected).toBe(!mockJobs[1].id);
     });
 
-    it('should reset jobForm when no job is selected', () => {
+    it('should reset jobForm and set newJobSelected to false when no job is selected', () => {
       mockJobService.selectedJob$ = of(null);
       component.ngOnInit();
       expect(component.jobForm.value).toEqual({
-        id: null,
         jobTitle: null,
         companyName: null,
         priority: null,
@@ -181,6 +193,7 @@ describe('JobDetailComponent', () => {
         followUpDate: null,
         notes: null,
       });
+      expect(component.newJobSelected).toBe(false);
     });
   });
 
@@ -211,10 +224,24 @@ describe('JobDetailComponent', () => {
   });
 
   describe('saveJob', () => {
-    it('should call jobService.saveJob if the form is dirty and valid', () => {
+    it('should call jobService.saveJob with form values and original job ID if the form is dirty, valid, and not new', () => {
       const job = mockJobs[0];
-      component.jobForm.setValue(job);
+      component.jobForm.patchValue(job);
       component.jobForm.markAsDirty();
+      component.originalJobData = job;
+      component.newJobSelected = false;
+      mockJobService.saveJob.and.returnValue(of(job));
+
+      component.saveJob();
+
+      expect(mockJobService.saveJob).toHaveBeenCalledWith(job);
+    });
+
+    it('should call jobService.saveJob with form values if the form is dirty, valid, and new', () => {
+      const job = _.omit(mockJobs[1], 'id');
+      component.jobForm.patchValue(job);
+      component.jobForm.markAsDirty();
+      component.newJobSelected = true;
       mockJobService.saveJob.and.returnValue(of(job));
 
       component.saveJob();
@@ -224,7 +251,7 @@ describe('JobDetailComponent', () => {
 
     it('should not call jobService.saveJob if the form is not dirty', () => {
       const job = mockJobs[0];
-      component.jobForm.setValue(job);
+      component.jobForm.patchValue(job);
       component.jobForm.markAsPristine();
       mockJobService.saveJob.and.returnValue(of(job));
 
@@ -234,8 +261,8 @@ describe('JobDetailComponent', () => {
     });
 
     it('should not call jobService.saveJob if the form is not valid', () => {
-      const job = mockJobs[0];
-      component.jobForm.setValue(job);
+      const job = mockJobs[1];
+      component.jobForm.patchValue(job);
       component.jobForm.markAsDirty();
       component.jobForm.setErrors({ invalid: true });
       mockJobService.saveJob.and.returnValue(of(job));
@@ -247,7 +274,7 @@ describe('JobDetailComponent', () => {
 
     it('should show a success notification and reset the form on success', () => {
       const job = mockJobs[0];
-      component.jobForm.setValue(job);
+      component.jobForm.patchValue(job);
       component.jobForm.markAsDirty();
       mockJobService.saveJob.and.returnValue(of(job));
       spyOn(component.jobForm, 'reset');
@@ -261,8 +288,8 @@ describe('JobDetailComponent', () => {
     });
 
     it('should show an error notification on error', () => {
-      const job = mockJobs[0];
-      component.jobForm.setValue(job);
+      const job = mockJobs[1];
+      component.jobForm.patchValue(job);
       component.jobForm.markAsDirty();
       const error = new Error('Test error');
       mockJobService.saveJob.and.returnValue(throwError(() => error));
@@ -276,10 +303,22 @@ describe('JobDetailComponent', () => {
   });
 
   describe('cancel', () => {
-    it('should reset the form to the original job data', () => {
+    it('should reset the form and call jobService.discardNewJob if newJobSelected is true', () => {
+      spyOn(component.jobForm, 'reset');
+      mockJobService.discardNewJob.and.returnValue(undefined);
+      component.newJobSelected = true;
+
+      component.cancel();
+
+      expect(component.jobForm.reset).toHaveBeenCalled();
+      expect(mockJobService.discardNewJob).toHaveBeenCalled();
+    });
+
+    it('should reset the form to the original job data if newJobSelected is false', () => {
       const job = mockJobs[0];
       component.originalJobData = job;
       spyOn(component.jobForm, 'reset');
+      component.newJobSelected = false;
 
       component.cancel();
 

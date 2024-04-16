@@ -25,7 +25,8 @@ export class JobTableComponent implements OnInit, OnDestroy {
     'postingUrl',
   ];
   jobs!: Job[];
-  selectedJob!: Job;
+  selectedJob!: Job | undefined;
+  newJobSelected = false;
   private jobsSubscription?: Subscription;
   private selectedJobSubscription?: Subscription;
 
@@ -39,6 +40,10 @@ export class JobTableComponent implements OnInit, OnDestroy {
       (selectedJob) => {
         if (selectedJob) {
           this.selectedJob = selectedJob;
+          this.newJobSelected = !selectedJob.id;
+        } else {
+          this.selectedJob = undefined;
+          this.newJobSelected = false;
         }
       }
     );
@@ -58,4 +63,12 @@ export class JobTableComponent implements OnInit, OnDestroy {
     this.jobService.selectJob(job);
     this.selectedJob = job;
   }
+
+  addJob = (): void => {
+    this.jobService.addJob();
+  };
+
+  deleteJob = (): void => {
+    this.jobService.deleteJob();
+  };
 }

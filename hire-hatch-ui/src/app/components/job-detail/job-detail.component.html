@@ -146,7 +146,7 @@
         <app-action-button
           [label]="'Cancel'"
           [action]="cancel"
-          [disabled]="!this.jobForm.dirty"
+          [disabled]="!this.jobForm.dirty && !newJobSelected"
           [type]="'button'"
           [icon]="'cancel'"
         ></app-action-button>

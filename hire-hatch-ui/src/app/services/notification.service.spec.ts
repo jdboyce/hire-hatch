@@ -62,25 +62,27 @@ describe('NotificationService', () => {
     });
   });
 
-  it('should show confirmation dialog and execute callback if confirmed', () => {
-    const callback = jasmine.createSpy('confirmCallback');
+  it('should show confirmation dialog and return true if confirmed', (done) => {
     dialogRefSpyObj.afterClosed.and.returnValue(of(true));
 
-    service.showConfirmation('Confirm?', callback);
-    expect(dialogSpy.open).toHaveBeenCalledWith(ConfirmationDialogComponent, {
-      data: { message: 'Confirm?' },
+    service.showConfirmation('Confirm?').subscribe((result) => {
+      expect(result).toBe(true);
+      expect(dialogSpy.open).toHaveBeenCalledWith(ConfirmationDialogComponent, {
+        data: { message: 'Confirm?' },
+      });
+      done();
     });
-    expect(callback).toHaveBeenCalled();
   });
 
-  it('should show confirmation dialog and not execute callback if not confirmed', () => {
-    const callback = jasmine.createSpy('confirmCallback');
+  it('should show confirmation dialog and return false if not confirmed', (done) => {
     dialogRefSpyObj.afterClosed.and.returnValue(of(false));
 
-    service.showConfirmation('Confirm?', callback);
-    expect(dialogSpy.open).toHaveBeenCalledWith(ConfirmationDialogComponent, {
-      data: { message: 'Confirm?' },
+    service.showConfirmation('Confirm?').subscribe((result) => {
+      expect(result).toBe(false);
+      expect(dialogSpy.open).toHaveBeenCalledWith(ConfirmationDialogComponent, {
+        data: { message: 'Confirm?' },
+      });
+      done();
     });
-    expect(callback).not.toHaveBeenCalled();
   });
 });

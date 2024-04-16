@@ -1,15 +1,19 @@
 <div class="job-table">
   <div class="table-actions">
     <app-action-button
+      [label]="'Add'"
+      [action]="addJob"
+      [disabled]="newJobSelected"
       [type]="'button'"
       [icon]="'add_circle'"
-      [label]="'Add'"
       class="left-action-button"
     ></app-action-button>
     <app-action-button
+      [label]="'Delete'"
+      [action]="deleteJob"
+      [disabled]="!selectedJob"
       [type]="'button'"
       [icon]="'remove_circle'"
-      [label]="'Remove'"
     ></app-action-button>
   </div>
   <table mat-table [dataSource]="jobs">
@@ -19,7 +23,7 @@
         mat-cell
         *matCellDef="let job"
         [class.selected-job]="job === selectedJob"
-        (click)="selectJob(job)"
+        (click)="!newJobSelected && selectJob(job)"
       >
         {{ job.jobTitle }}
       </td>
@@ -31,7 +35,7 @@
         mat-cell
         *matCellDef="let job"
         [class.selected-job]="job === selectedJob"
-        (click)="selectJob(job)"
+        (click)="!newJobSelected && selectJob(job)"
       >
         {{ job.companyName }}
       </td>
@@ -43,7 +47,7 @@
         mat-cell
         *matCellDef="let job"
         [class.selected-job]="job === selectedJob"
-        (click)="selectJob(job)"
+        (click)="!newJobSelected && selectJob(job)"
       >
         {{ job.priority }}
       </td>
@@ -55,7 +59,7 @@
         mat-cell
         *matCellDef="let job"
         [class.selected-job]="job === selectedJob"
-        (click)="selectJob(job)"
+        (click)="!newJobSelected && selectJob(job)"
       >
         {{ job.status }}
       </td>
@@ -67,7 +71,7 @@
         mat-cell
         *matCellDef="let job"
         [class.selected-job]="job === selectedJob"
-        (click)="selectJob(job)"
+        (click)="!newJobSelected && selectJob(job)"
       >
         {{ job.postingUrl }}
       </td>
