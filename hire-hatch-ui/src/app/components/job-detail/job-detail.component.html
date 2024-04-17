@@ -24,9 +24,11 @@
       >
         <mat-label>Priority</mat-label>
         <mat-select formControlName="priority">
-          <mat-option *ngFor="let priority of priorities" [value]="priority">{{
-            priority
-          }}</mat-option>
+          <mat-option
+            *ngFor="let priority of dropdownOptions.priorities"
+            [value]="priority"
+            >{{ priority }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
 
@@ -36,9 +38,11 @@
       >
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
-          <mat-option *ngFor="let status of statuses" [value]="status">{{
-            status
-          }}</mat-option>
+          <mat-option
+            *ngFor="let status of dropdownOptions.statuses"
+            [value]="status"
+            >{{ status }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
 
@@ -77,9 +81,11 @@
       >
         <mat-label>Type</mat-label>
         <mat-select formControlName="type">
-          <mat-option *ngFor="let type of types" [value]="type">{{
-            type
-          }}</mat-option>
+          <mat-option
+            *ngFor="let type of dropdownOptions.types"
+            [value]="type"
+            >{{ type }}</mat-option
+          >
         </mat-select>
       </mat-form-field>
 

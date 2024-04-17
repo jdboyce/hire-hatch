@@ -19,6 +19,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NotificationService } from 'src/app/services/notification.service';
 import * as _ from 'lodash';
+import { DropdownOptions } from 'src/app/models/dropdown-options.model';
 
 describe('JobDetailComponent', () => {
   const mockJobs: Job[] = [
@@ -55,6 +56,11 @@ describe('JobDetailComponent', () => {
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
   ];
+  const mockDropdownOptions: DropdownOptions = {
+    types: ['Full-time', 'Part-time'],
+    priorities: ['High', 'Medium', 'Low'],
+    statuses: ['Submitted Application', 'Interviewed', 'Offer Accepted'],
+  };
 
   let component: JobDetailComponent;
   let fixture: ComponentFixture<JobDetailComponent>;
@@ -68,8 +74,10 @@ describe('JobDetailComponent', () => {
       'getJobs',
       'saveJob',
       'discardNewJob',
+      'getDropdownOptions',
     ]);
     mockJobService.selectedJob$ = selectedJobSubject.asObservable();
+    mockJobService.getDropdownOptions.and.returnValue(of(mockDropdownOptions));
     mockNotificationService = jasmine.createSpyObj('NotificationService', [
       'showSuccess',
       'showError',
@@ -194,6 +202,17 @@ describe('JobDetailComponent', () => {
         notes: null,
       });
       expect(component.newJobSelected).toBe(false);
+    });
+
+    it('should update dropdownOptions when getDropdownOptions is called', () => {
+      component.dropdownOptions = {
+        types: [],
+        priorities: [],
+        statuses: [],
+      };
+      component.ngOnInit();
+      expect(mockJobService.getDropdownOptions).toHaveBeenCalledWith();
+      expect(component.dropdownOptions).toEqual(mockDropdownOptions);
     });
   });
 

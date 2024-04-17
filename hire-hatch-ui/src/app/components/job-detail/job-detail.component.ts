@@ -3,7 +3,8 @@ import { JobService } from 'src/app/services/job.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Job } from 'src/app/models/job.model';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
+import { DropdownOptions } from 'src/app/models/dropdown-options.model';
 
 @Component({
   selector: 'app-job-detail',
@@ -12,24 +13,14 @@ import { Subscription } from 'rxjs';
 })
 export class JobDetailComponent implements OnInit, OnDestroy {
   jobForm!: FormGroup;
+  dropdownOptions: DropdownOptions = {
+    types: [],
+    priorities: [],
+    statuses: [],
+  };
   originalJobData: Job | undefined;
   selectedJobSubscription?: Subscription;
   newJobSelected = false;
-
-  // TODO: Remove hardcoded dropdown options and fetch from server instead.
-  types = ['Full-time', 'Contract', 'Part-time'];
-  priorities = ['High', 'Medium', 'Low'];
-  statuses = [
-    'Reviewing Posting',
-    'Not Interested',
-    'Prepping Application',
-    'Submitted Application',
-    'Prepping Interview',
-    'Interviewed',
-    'Offer Received',
-    'Declined',
-    'Offer Accepted',
-  ];
 
   constructor(
     private jobService: JobService,
@@ -56,13 +47,6 @@ export class JobDetailComponent implements OnInit, OnDestroy {
     this.selectedJobSubscription = this.jobService.selectedJob$.subscribe(
       (selectedJob) => {
         if (selectedJob) {
-          // TODO: Move date conversion logic to JobService.
-          if (selectedJob.dateApplied) {
-            selectedJob.dateApplied = new Date(selectedJob.dateApplied);
-          }
-          if (selectedJob.followUpDate) {
-            selectedJob.followUpDate = new Date(selectedJob.followUpDate);
-          }
           this.originalJobData = { ...selectedJob };
           this.newJobSelected = !selectedJob.id;
           this.jobForm.reset(selectedJob);
@@ -72,6 +56,14 @@ export class JobDetailComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    this.jobService.getDropdownOptions().subscribe((options) => {
+      if (options) {
+        this.dropdownOptions.types = options.types;
+        this.dropdownOptions.priorities = options.priorities;
+        this.dropdownOptions.statuses = options.statuses;
+      }
+    });
   }
 
   ngOnDestroy(): void {

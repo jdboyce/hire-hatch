@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { NotificationService } from './notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DropdownOptions } from '../models/dropdown-options.model';
 
 describe('JobService', () => {
   const mockJobs: Job[] = [
@@ -61,6 +62,11 @@ describe('JobService', () => {
       notes: 'Offers mentorship programs, supports professional development.',
     },
   ];
+  const mockDropdownOptions: DropdownOptions = {
+    types: ['Full-time', 'Part-time'],
+    priorities: ['High', 'Medium', 'Low'],
+    statuses: ['Submitted Application', 'Interviewed', 'Offer Accepted'],
+  };
 
   let service: JobService;
   let httpMock: HttpTestingController;
@@ -117,6 +123,50 @@ describe('JobService', () => {
       expect(request.request.method).toBe('GET');
       request.flush(mockJobs);
     });
+
+    it('should handle errors', () => {
+      const mockError = new ProgressEvent('Network error');
+
+      service.getJobs().subscribe({
+        next: () => fail('should have failed with the network error'),
+        error: (error: HttpErrorResponse) => {
+          expect(error.error).toBe(mockError);
+        },
+      });
+
+      const request = httpMock.expectOne('http://localhost:3000/jobs');
+      request.error(mockError);
+    });
+  });
+
+  describe('getDropdownOptions', () => {
+    it('should retrieve dropdown options from API via GET', () => {
+      service.getDropdownOptions().subscribe((options) => {
+        expect(options).toEqual(mockDropdownOptions);
+      });
+
+      const request = httpMock.expectOne(
+        `http://localhost:3000/dropdown-options`
+      );
+      expect(request.request.method).toBe('GET');
+      request.flush(mockDropdownOptions);
+    });
+
+    it('should handle errors', () => {
+      const mockError = new ProgressEvent('Network error');
+
+      service.getDropdownOptions().subscribe({
+        next: () => fail('should have failed with the network error'),
+        error: (error: HttpErrorResponse) => {
+          expect(error.error).toBe(mockError);
+        },
+      });
+
+      const request = httpMock.expectOne(
+        'http://localhost:3000/dropdown-options'
+      );
+      request.error(mockError);
+    });
   });
 
   describe('selectJob', () => {
@@ -145,7 +195,7 @@ describe('JobService', () => {
       mockGetJobs = spyOn(service, 'getJobs');
     });
 
-    it('should call jobsSubject.next and selectJob with the first job when jobs are returned and selectedJobId is not provided', () => {
+    it('should convert date strings to Date objects, call jobsSubject.next and selectJob with the first job when jobs are returned and selectedJobId is not provided', () => {
       const jobs = [...mockJobs];
       mockGetJobs.and.returnValue(of(jobs));
       spyOn(service['jobsSubject'], 'next');
@@ -153,11 +203,21 @@ describe('JobService', () => {
 
       service.loadData();
 
-      expect(service['jobsSubject'].next).toHaveBeenCalledWith(jobs);
-      expect(service.selectJob).toHaveBeenCalledWith(jobs[0]);
+      const convertedJobs = jobs.map((job) => ({
+        ...job,
+        dateApplied: job.dateApplied
+          ? new Date(job.dateApplied)
+          : job.dateApplied,
+        followUpDate: job.followUpDate
+          ? new Date(job.followUpDate)
+          : job.followUpDate,
+      }));
+
+      expect(service['jobsSubject'].next).toHaveBeenCalledWith(convertedJobs);
+      expect(service.selectJob).toHaveBeenCalledWith(convertedJobs[0]);
     });
 
-    it('should call jobsSubject.next and selectJob with the selected job when jobs are returned and selectedJobId is provided', () => {
+    it('should convert date strings to Date objects, call jobsSubject.next and selectJob with the selected job when jobs are returned and selectedJobId is provided', () => {
       const jobs = [...mockJobs];
       const selectedJobId = jobs[1].id;
       mockGetJobs.and.returnValue(of(jobs));
@@ -166,8 +226,18 @@ describe('JobService', () => {
 
       service.loadData(selectedJobId);
 
-      expect(service['jobsSubject'].next).toHaveBeenCalledWith(jobs);
-      expect(service.selectJob).toHaveBeenCalledWith(jobs[1]);
+      const convertedJobs = jobs.map((job) => ({
+        ...job,
+        dateApplied: job.dateApplied
+          ? new Date(job.dateApplied)
+          : job.dateApplied,
+        followUpDate: job.followUpDate
+          ? new Date(job.followUpDate)
+          : job.followUpDate,
+      }));
+
+      expect(service['jobsSubject'].next).toHaveBeenCalledWith(convertedJobs);
+      expect(service.selectJob).toHaveBeenCalledWith(convertedJobs[1]);
     });
 
     it('should call jobsSubject.next with an empty array and selectedJob.next with null when no jobs are returned', () => {

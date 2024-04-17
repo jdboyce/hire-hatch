@@ -75,5 +75,20 @@
       "followUpDate": "",
       "notes": "Offers mentorship programs, supports professional development."
     }
-  ]
+  ],
+  "dropdown-options": {
+    "types": ["Full-time", "Contract", "Part-time"],
+    "priorities": ["High", "Medium", "Low"],
+    "statuses": [
+      "Reviewing Posting",
+      "Not Interested",
+      "Prepping Application",
+      "Submitted Application",
+      "Prepping Interview",
+      "Interviewed",
+      "Offer Received",
+      "Declined",
+      "Offer Accepted"
+    ]
+  }
 }

@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
 import { Job } from '../models/job.model';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
+import { DropdownOptions } from '../models/dropdown-options.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,23 @@ export class JobService {
   ) {}
 
   getJobs(): Observable<Job[]> {
-    return this.http.get<Job[]>('http://localhost:3000/jobs');
+    return this.http.get<Job[]>('http://localhost:3000/jobs').pipe(
+      catchError((error) => {
+        console.error('An error occurred:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getDropdownOptions(): Observable<DropdownOptions> {
+    return this.http
+      .get<DropdownOptions>('http://localhost:3000/dropdown-options')
+      .pipe(
+        catchError((error) => {
+          console.error('An error occurred:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   selectJob(job: Job): void {
@@ -37,6 +54,14 @@ export class JobService {
       .pipe(
         tap((jobs) => {
           if (jobs.length) {
+            jobs.forEach((job) => {
+              if (job.dateApplied) {
+                job.dateApplied = new Date(job.dateApplied);
+              }
+              if (job.followUpDate) {
+                job.followUpDate = new Date(job.followUpDate);
+              }
+            });
             this.jobsSubject.next(jobs);
             if (selectedJobId) {
               const job = jobs.find((j) => j.id === selectedJobId);
