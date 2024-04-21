@@ -8,6 +8,69 @@ body {
 
 .job-table {
   @include mat.table-density(-2);
+
+  .table-filter {
+    background: #424242;
+    height: 44px;
+    align-items: center;
+    display: flex;
+    margin: 0 12px;
+    padding: 0 16px;
+    border-radius: 4px;
+    span {
+      color: #ffffffde;
+      font-size: 12px;
+    }
+    input {
+      background: #4a4a4a;
+      height: 26px;
+      width: 300px;
+      margin-left: 12px;
+      padding: 0 10px 0 10px;
+      border: 1px solid #8a8a8a;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+  }
+
+  .table-paginator {
+    .mat-mdc-paginator {
+      border-radius: 4px;
+
+      .mat-mdc-paginator-outer-container {
+        max-height: 44px;
+        padding-left: 16px;
+      }
+      .mat-mdc-paginator-container {
+        min-height: 44px;
+        padding: 0;
+      }
+
+      .mat-mdc-paginator-page-size-label {
+        margin-left: 0;
+      }
+
+      .mat-mdc-paginator-page-size {
+        align-items: center;
+      }
+
+      .mat-mdc-paginator-page-size-select .mat-mdc-text-field-wrapper {
+        align-items: center;
+      }
+
+      .mat-mdc-text-field-wrapper.mdc-text-field.mdc-text-field--outlined {
+        height: 26px;
+      }
+
+      .mat-mdc-paginator-range-actions {
+        max-height: 44px;
+      }
+
+      .mat-mdc-paginator-range-label {
+        margin: 0 14px 0 16px;
+      }
+    }
+  }
 }
 
 .job-detail-form {

@@ -49,6 +49,14 @@ export class JobService {
     }
   }
 
+  deselectJob(): void {
+    if (this.newJobSelected) {
+      this.discardNewJob();
+    } else {
+      this.selectedJob.next(null);
+    }
+  }
+
   loadData(selectedJobId?: string): void {
     this.getJobs()
       .pipe(

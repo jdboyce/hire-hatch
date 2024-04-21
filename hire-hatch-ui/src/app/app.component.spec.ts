@@ -7,6 +7,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActionButtonComponent } from './shared/action-button/action-button.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -16,6 +18,8 @@ describe('AppComponent', () => {
         HttpClientTestingModule,
         MatSnackBarModule,
         MatDialogModule,
+        MatPaginatorModule,
+        MatSortModule,
       ],
       declarations: [
         AppComponent,

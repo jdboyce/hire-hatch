@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobTableComponent } from './job-table.component';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Job } from 'src/app/models/job.model';
 import { Subscription, of } from 'rxjs';
 import { JobService } from 'src/app/services/job.service';
@@ -9,6 +9,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import {
+  MatPaginator,
+  MatPaginatorIntl,
+  MatPaginatorModule,
+} from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ChangeDetectorRef } from '@angular/core';
 
 describe('JobTableComponent', () => {
   const mockJobs: Job[] = [
@@ -45,12 +53,16 @@ describe('JobTableComponent', () => {
         'Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews.',
     },
   ];
+  const mockChangeDetectorRef = {
+    markForCheck: () => {},
+  } as unknown as ChangeDetectorRef;
 
   let component: JobTableComponent;
   let fixture: ComponentFixture<JobTableComponent>;
   let mockJobService = {
     getJobs: () => of(mockJobs),
     selectJob: (job: Job) => {},
+    deselectJob: () => {},
     jobs$: of(mockJobs),
     selectedJob$: of(mockJobs[0]),
     loadData: () => {},
@@ -68,6 +80,9 @@ describe('JobTableComponent', () => {
         MatButtonModule,
         MatSnackBarModule,
         MatDialogModule,
+        MatPaginatorModule,
+        MatSortModule,
+        NoopAnimationsModule,
       ],
     }).compileComponents();
   });
@@ -101,7 +116,7 @@ describe('JobTableComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.jobs).toBe(jobs);
+      expect(component.dataSource.data).toEqual(jobs);
     });
 
     it('should update selectedJob and newJobSelected when selectedJob$ emits', () => {
@@ -121,6 +136,15 @@ describe('JobTableComponent', () => {
 
       expect(component.selectedJob).toBeUndefined();
       expect(component.newJobSelected).toBe(false);
+    });
+  });
+
+  describe('ngAfterViewInit', () => {
+    it('should have paginator and sort in view query after view init', () => {
+      fixture.detectChanges();
+
+      expect(component.paginator).toBeDefined();
+      expect(component.sort).toBeDefined();
     });
   });
 
@@ -147,6 +171,71 @@ describe('JobTableComponent', () => {
       component.selectJob(job);
       expect(component.selectedJob).toEqual(job);
       expect(mockJobService.selectJob).toHaveBeenCalledWith(job);
+    });
+  });
+
+  describe('deselectJob', () => {
+    it('should call deselectJob on jobService and set selectedJob to undefined', () => {
+      const mockJobService = jasmine.createSpyObj<JobService>('JobService', [
+        'deselectJob',
+      ]);
+      component = new JobTableComponent(mockJobService);
+
+      component.deselectJob();
+
+      expect(mockJobService.deselectJob).toHaveBeenCalled();
+      expect(component.selectedJob).toBeUndefined();
+    });
+  });
+
+  describe('applyFilter', () => {
+    it('should set the dataSource filter', () => {
+      const testFilterValue = 'test filter value';
+      const event = { target: { value: testFilterValue } } as unknown as Event;
+      component.dataSource = new MatTableDataSource<Job>(mockJobs);
+
+      component.applyFilter(event);
+
+      expect(component.dataSource.filter).toBe(testFilterValue);
+    });
+
+    it('should reset the paginator', () => {
+      const event = {
+        target: { value: 'test filter value' },
+      } as unknown as Event;
+      component.dataSource = new MatTableDataSource<Job>(mockJobs);
+      component.dataSource.paginator = new MatPaginator(
+        new MatPaginatorIntl(),
+        mockChangeDetectorRef
+      );
+      spyOn(component.dataSource.paginator, 'firstPage');
+
+      component.applyFilter(event);
+
+      expect(component.dataSource.paginator.firstPage).toHaveBeenCalled();
+    });
+
+    it('should select the first job if there are filtered jobs', () => {
+      const testFilterValue = mockJobs[0].jobTitle;
+      const event = { target: { value: testFilterValue } } as unknown as Event;
+      component.dataSource = new MatTableDataSource<Job>(mockJobs);
+      spyOn(component, 'selectJob');
+
+      component.applyFilter(event);
+
+      expect(component.selectJob).toHaveBeenCalledWith(mockJobs[0]);
+    });
+
+    it('should deselect the job if there are no filtered jobs', () => {
+      const event = {
+        target: { value: 'nonexistent job' },
+      } as unknown as Event;
+      component.dataSource = new MatTableDataSource<Job>(mockJobs);
+      spyOn(component, 'deselectJob');
+
+      component.applyFilter(event);
+
+      expect(component.deselectJob).toHaveBeenCalled();
     });
   });
 

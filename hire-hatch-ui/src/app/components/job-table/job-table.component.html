@@ -1,24 +1,45 @@
 <div class="job-table">
   <div class="table-actions">
-    <app-action-button
-      [label]="'Add'"
-      [action]="addJob"
-      [disabled]="newJobSelected"
-      [type]="'button'"
-      [icon]="'add_circle'"
-      class="left-action-button"
-    ></app-action-button>
-    <app-action-button
-      [label]="'Delete'"
-      [action]="deleteJob"
-      [disabled]="!selectedJob"
-      [type]="'button'"
-      [icon]="'remove_circle'"
-    ></app-action-button>
+    <div>
+      <app-action-button
+        [label]="'Add'"
+        [action]="addJob"
+        [disabled]="newJobSelected"
+        [type]="'button'"
+        [icon]="'add_circle'"
+        class="left-action-button"
+      ></app-action-button>
+      <app-action-button
+        [label]="'Delete'"
+        [action]="deleteJob"
+        [disabled]="!selectedJob"
+        [type]="'button'"
+        [icon]="'remove_circle'"
+      ></app-action-button>
+    </div>
+
+    <div class="table-filter">
+      <span>Filter:</span>
+      <input
+        matInput
+        type="text"
+        (keyup)="applyFilter($event)"
+        [disabled]="newJobSelected"
+      />
+    </div>
+
+    <div class="table-paginator">
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons
+        [disabled]="newJobSelected"
+      ></mat-paginator>
+    </div>
   </div>
-  <table mat-table [dataSource]="jobs">
+
+  <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="jobTitle">
-      <th mat-header-cell *matHeaderCellDef>Job Title</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</th>
       <td
         mat-cell
         *matCellDef="let job"
@@ -30,7 +51,7 @@
     </ng-container>
 
     <ng-container matColumnDef="companyName">
-      <th mat-header-cell *matHeaderCellDef>Company Name</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Company Name</th>
       <td
         mat-cell
         *matCellDef="let job"
@@ -42,7 +63,7 @@
     </ng-container>
 
     <ng-container matColumnDef="priority">
-      <th mat-header-cell *matHeaderCellDef>Priority</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
       <td
         mat-cell
         *matCellDef="let job"
@@ -54,7 +75,7 @@
     </ng-container>
 
     <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
       <td
         mat-cell
         *matCellDef="let job"
@@ -66,14 +87,16 @@
     </ng-container>
 
     <ng-container matColumnDef="postingUrl">
-      <th mat-header-cell *matHeaderCellDef>Posting URL</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Posting URL</th>
       <td
         mat-cell
         *matCellDef="let job"
         [class.selected-job]="job === selectedJob"
         (click)="!newJobSelected && selectJob(job)"
       >
-        {{ job.postingUrl }}
+        <a class="job-link" [href]="job.postingUrl" target="_blank">{{
+          job.postingUrl
+        }}</a>
       </td>
     </ng-container>
 

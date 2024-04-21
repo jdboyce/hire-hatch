@@ -190,6 +190,28 @@ describe('JobService', () => {
     });
   });
 
+  describe('deselectJob', () => {
+    it('should call discardNewJob if newJobSelected is true', () => {
+      service.newJobSelected = true;
+      spyOn(service, 'discardNewJob');
+
+      service.deselectJob();
+
+      expect(service.discardNewJob).toHaveBeenCalled();
+    });
+
+    it('should set selectedJob to null if newJobSelected is false', (done) => {
+      service.newJobSelected = false;
+
+      service.deselectJob();
+
+      service.selectedJob$.subscribe((job) => {
+        expect(job).toBeNull();
+        done();
+      });
+    });
+  });
+
   describe('loadData', () => {
     beforeEach(() => {
       mockGetJobs = spyOn(service, 'getJobs');
