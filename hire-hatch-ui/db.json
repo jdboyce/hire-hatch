@@ -1,0 +1,94 @@
+{
+  "jobs": [
+    {
+      "id": "3107346e-69ca-4559-bf77-36ff01cfed22",
+      "jobTitle": "Frontend Developer",
+      "companyName": "Tech Innovations Inc.",
+      "priority": "High",
+      "status": "Submitted Application",
+      "postingUrl": "https://www.linkedin.com/jobs/12345",
+      "source": "LinkedIn",
+      "salary": "$95,000",
+      "type": "Full-time",
+      "location": "Remote",
+      "dateApplied": "2024-02-16T00:00:00-05:00",
+      "followUpDate": "2024-02-20T00:00:00-05:00",
+      "notes": "Angular-focused team. Values collaboration and continuous learning. Good work-life balance."
+    },
+    {
+      "id": "a6e5e5a0-5c1d-4f6e-8e5f-7e7f8c6e9c7e",
+      "jobTitle": "Angular Developer",
+      "companyName": "Web Wizards Agency",
+      "priority": "High",
+      "status": "Interviewed",
+      "postingUrl": "https://www.glassdoor.com/jobs/67890",
+      "source": "Glassdoor",
+      "salary": "$90,000",
+      "type": "Full-time",
+      "location": "Remote",
+      "dateApplied": "2024-02-10T00:00:00-05:00",
+      "followUpDate": "2024-02-23T20:17:38-05:00",
+      "notes": "Startup culture. Encourages candid dialogue. Flexible and remote. Great reviews."
+    },
+    {
+      "id": "d9f3d0c2-7b6e-4b1e-9c3e-8d7f6c5e4d3d",
+      "jobTitle": "Full Stack Developer",
+      "companyName": "Creative Minds Co.",
+      "priority": "Medium",
+      "status": "Prepping Interview",
+      "postingUrl": "https://www.webwizards.com/careers",
+      "source": "Company Website",
+      "salary": "$100,000",
+      "type": "Contract",
+      "location": "Hybrid (Charlotte, NC)",
+      "dateApplied": "2024-02-06T00:00:00-05:00",
+      "followUpDate": "",
+      "notes": ".NET Core and React in stack. Good salary. Offers annual tech conference tickets."
+    },
+    {
+      "id": "b4c2b0a4-3d6e-4c1e-9b3e-8a7f6b5c4a3b",
+      "jobTitle": "Software Engineer",
+      "companyName": "Digital Solutions Ltd.",
+      "priority": "Medium",
+      "status": "Offer Received",
+      "postingUrl": "https://www.indeed.com/jobs/54321",
+      "source": "Indeed",
+      "salary": "$85,000",
+      "type": "Full-time",
+      "location": "Remote",
+      "dateApplied": "2024-02-06T00:00:00-05:00",
+      "followUpDate": "2024-02-19T00:00:00-05:00",
+      "notes": "Dynamic culture with emphasis on agile development. Competitive benefits."
+    },
+    {
+      "id": "dfd1aced-c9b2-48cf-9029-789a9fe4d4de",
+      "jobTitle": "Lead Developer",
+      "companyName": "InnovateTech Solutions",
+      "priority": "Low",
+      "status": "Reviewing Posting",
+      "postingUrl": "https://www.careerbuilder.com/jobs/98765",
+      "source": "CareerBuilder",
+      "salary": "$40/hour",
+      "type": "Part-time",
+      "location": "On-site (Charlotte, NC)",
+      "dateApplied": "",
+      "followUpDate": "",
+      "notes": "Offers mentorship programs, supports professional development."
+    }
+  ],
+  "dropdown-options": {
+    "types": ["Full-time", "Contract", "Part-time"],
+    "priorities": ["High", "Medium", "Low"],
+    "statuses": [
+      "Reviewing Posting",
+      "Not Interested",
+      "Prepping Application",
+      "Submitted Application",
+      "Prepping Interview",
+      "Interviewed",
+      "Offer Received",
+      "Declined",
+      "Offer Accepted"
+    ]
+  }
+}

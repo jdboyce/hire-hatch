@@ -1,0 +1,162 @@
+<mat-card
+  *ngIf="jobForm.value && (jobForm.value.jobTitle || jobForm.value.companyName)"
+  class="job-detail-form"
+>
+  <form [formGroup]="jobForm">
+    <mat-card-header class="header-title-input">
+      <mat-form-field appearance="outline" class="input-form-field">
+        <input matInput placeholder="Job Title" formControlName="jobTitle" />
+      </mat-form-field>
+    </mat-card-header>
+
+    <div class="card-flex-items-container">
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-medium input-form-field"
+      >
+        <mat-label>Company Name</mat-label>
+        <input matInput formControlName="companyName" />
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field"
+      >
+        <mat-label>Priority</mat-label>
+        <mat-select formControlName="priority">
+          <mat-option
+            *ngFor="let priority of dropdownOptions.priorities"
+            [value]="priority"
+            >{{ priority }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-medium input-form-field"
+      >
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option
+            *ngFor="let status of dropdownOptions.statuses"
+            [value]="status"
+            >{{ status }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-large input-form-field url-field"
+      >
+        <mat-label>Posting URL</mat-label>
+        <input matInput formControlName="postingUrl" />
+        <button mat-flat-button (click)="openUrl()">
+          <mat-icon>open_in_new</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <div class="card-flex-items-container">
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field"
+      >
+        <mat-label>Source</mat-label>
+        <input matInput formControlName="source" />
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field"
+      >
+        <mat-label>Salary</mat-label>
+        <input matInput formControlName="salary" />
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field"
+      >
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option
+            *ngFor="let type of dropdownOptions.types"
+            [value]="type"
+            >{{ type }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field"
+      >
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="location" />
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field date-picker"
+      >
+        <mat-label>Date Applied</mat-label>
+        <input
+          matInput
+          [matDatepicker]="dateAppliedPicker"
+          formControlName="dateApplied"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="dateAppliedPicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #dateAppliedPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-small input-form-field date-picker"
+      >
+        <mat-label>Follow Up</mat-label>
+        <input
+          matInput
+          [matDatepicker]="followUpDatePicker"
+          formControlName="followUpDate"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="followUpDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #followUpDatePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="card-flex-items-container">
+      <mat-form-field
+        appearance="outline"
+        class="flex-item-large input-form-field"
+      >
+        <mat-label>Notes</mat-label>
+        <input matInput formControlName="notes" />
+      </mat-form-field>
+      <div class="flex-item-extra-small">
+        <app-action-button
+          [label]="'Save'"
+          [action]="saveJob"
+          [disabled]="!this.jobForm.dirty || !this.jobForm.valid"
+          [type]="'button'"
+          [icon]="'save'"
+          class="left-action-button"
+        ></app-action-button>
+        <app-action-button
+          [label]="'Cancel'"
+          [action]="cancel"
+          [disabled]="!this.jobForm.dirty && !newJobSelected"
+          [type]="'button'"
+          [icon]="'cancel'"
+        ></app-action-button>
+      </div>
+    </div>
+  </form>
+</mat-card>

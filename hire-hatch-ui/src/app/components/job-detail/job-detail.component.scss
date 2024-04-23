@@ -1,0 +1,29 @@
+$flex-item-margin: 10px;
+
+.card-flex-items-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-height: 70px;
+  flex-wrap: wrap;
+}
+
+.flex-item-extra-small {
+  flex: 0.5565;
+  margin: $flex-item-margin;
+}
+
+.flex-item-small {
+  flex: 1;
+  margin: $flex-item-margin;
+}
+
+.flex-item-medium {
+  flex: 2;
+  margin: $flex-item-margin;
+}
+
+.flex-item-large {
+  flex: 3;
+  margin: $flex-item-margin;
+}
