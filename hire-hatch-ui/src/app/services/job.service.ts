@@ -21,7 +21,7 @@ export class JobService {
   ) {}
 
   getJobs(): Observable<Job[]> {
-    return this.http.get<Job[]>('http://localhost:3000/jobs').pipe(
+    return this.http.get<Job[]>('http://localhost:5098/api/jobs').pipe(
       catchError((error) => {
         console.error('An error occurred:', error);
         return throwError(() => error);
@@ -31,7 +31,7 @@ export class JobService {
 
   getDropdownOptions(): Observable<DropdownOptions> {
     return this.http
-      .get<DropdownOptions>('http://localhost:3000/dropdown-options')
+      .get<DropdownOptions>('http://localhost:5098/api/dropdown-options')
       .pipe(
         catchError((error) => {
           console.error('An error occurred:', error);
@@ -91,7 +91,7 @@ export class JobService {
   saveJob(job: Job): Observable<Job> {
     if (job.id) {
       return this.http
-        .put<Job>(`http://localhost:3000/jobs/${job.id}`, job)
+        .put<Job>(`http://localhost:5098/api/jobs/${job.id}`, job)
         .pipe(
           catchError((error) => {
             this.selectJob(this.jobsSubject.getValue()[0]);
@@ -104,7 +104,7 @@ export class JobService {
         );
     } else {
       const newJob = job;
-      return this.http.post<Job>(`http://localhost:3000/jobs`, newJob).pipe(
+      return this.http.post<Job>(`http://localhost:5098/api/jobs`, newJob).pipe(
         catchError((error) => {
           this.newJobSelected = false;
           this.selectJob(this.jobsSubject.getValue()[0]);
@@ -162,7 +162,9 @@ export class JobService {
         .subscribe((confirmed) => {
           if (confirmed) {
             this.http
-              .delete(`http://localhost:3000/jobs/${currentSelectedJob?.id}`)
+              .delete(
+                `http://localhost:5098/api/jobs/${currentSelectedJob?.id}`
+              )
               .subscribe({
                 next: () => {
                   this.loadData();

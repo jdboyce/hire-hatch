@@ -119,7 +119,7 @@ describe('JobService', () => {
         expect(jobs).toEqual(mockJobs);
       });
 
-      const request = httpMock.expectOne(`http://localhost:3000/jobs`);
+      const request = httpMock.expectOne(`http://localhost:5098/api/jobs`);
       expect(request.request.method).toBe('GET');
       request.flush(mockJobs);
     });
@@ -134,7 +134,7 @@ describe('JobService', () => {
         },
       });
 
-      const request = httpMock.expectOne('http://localhost:3000/jobs');
+      const request = httpMock.expectOne('http://localhost:5098/api/jobs');
       request.error(mockError);
     });
   });
@@ -146,7 +146,7 @@ describe('JobService', () => {
       });
 
       const request = httpMock.expectOne(
-        `http://localhost:3000/dropdown-options`
+        `http://localhost:5098/api/dropdown-options`
       );
       expect(request.request.method).toBe('GET');
       request.flush(mockDropdownOptions);
@@ -163,7 +163,7 @@ describe('JobService', () => {
       });
 
       const request = httpMock.expectOne(
-        'http://localhost:3000/dropdown-options'
+        'http://localhost:5098/api/dropdown-options'
       );
       request.error(mockError);
     });
@@ -283,7 +283,7 @@ describe('JobService', () => {
       service.saveJob(mockJob).subscribe();
 
       const req = httpMock.expectOne(
-        `http://localhost:3000/jobs/${mockJob.id}`
+        `http://localhost:5098/api/jobs/${mockJob.id}`
       );
       expect(req.request.method).toBe('PUT');
       req.flush(mockJob);
@@ -301,7 +301,7 @@ describe('JobService', () => {
         expect(savedJob).toEqual(createdJob);
       });
 
-      const request = httpMock.expectOne(`http://localhost:3000/jobs`);
+      const request = httpMock.expectOne(`http://localhost:5098/api/jobs`);
       expect(request.request.method).toBe('POST');
       request.flush(createdJob);
 
@@ -405,7 +405,7 @@ describe('JobService', () => {
 
       service.deleteJob();
 
-      const req = httpMock.expectNone('http://localhost:3000/jobs/123');
+      const req = httpMock.expectNone('http://localhost:5098/api/jobs/123');
       expect(req).toBeUndefined();
     });
 
@@ -417,11 +417,13 @@ describe('JobService', () => {
 
       service.deleteJob();
 
-      const req = httpMock.expectOne(`http://localhost:3000/jobs/${mockJobId}`);
+      const req = httpMock.expectOne(
+        `http://localhost:5098/api/jobs/${mockJobId}`
+      );
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
 
-      const getReq = httpMock.expectOne('http://localhost:3000/jobs');
+      const getReq = httpMock.expectOne('http://localhost:5098/api/jobs');
       expect(getReq.request.method).toBe('GET');
       getReq.flush(mockJobs);
     });
@@ -435,7 +437,7 @@ describe('JobService', () => {
       service.deleteJob();
 
       const req = httpMock.expectOne(
-        `http://localhost:3000/jobs/${mockJobs[1].id}`
+        `http://localhost:5098/api/jobs/${mockJobs[1].id}`
       );
       req.flush(null);
 
@@ -451,7 +453,7 @@ describe('JobService', () => {
       service.deleteJob();
 
       const req = httpMock.expectOne(
-        `http://localhost:3000/jobs/${mockJobs[0].id}`
+        `http://localhost:5098/api/jobs/${mockJobs[0].id}`
       );
       req.flush('Server error', { status: 500, statusText: 'Server Error' });
 
