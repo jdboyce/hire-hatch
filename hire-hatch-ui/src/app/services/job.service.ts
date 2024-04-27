@@ -130,7 +130,7 @@ export class JobService {
         postingUrl: '',
         source: '',
         salary: '',
-        type: '',
+        jobType: '',
         location: '',
         notes: '',
       };

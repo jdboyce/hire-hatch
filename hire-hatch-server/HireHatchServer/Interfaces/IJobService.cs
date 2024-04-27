@@ -4,14 +4,14 @@ namespace HireHatchServer.Interfaces
 {
     public interface IJobService
     {
-        IEnumerable<Job> GetJobs();
+        (bool Success, string? ErrorMessage, IEnumerable<Job>? Jobs) GetJobs();
 
-        bool UpdateJob(string id, Job job);
+        (bool Success, string? ErrorMessage) UpdateJob(string id, Job job);
 
-        void AddJob(Job job);
+        (bool Success, string? ErrorMessage) AddJob(Job job);
 
-        bool DeleteJob(string id);
+        (bool Success, string? ErrorMessage) DeleteJob(string id);
 
-        DropdownOptions GetDropdownOptions();
+        (bool Success, string? ErrorMessage, DropdownOptions? DropdownOptions) GetDropdownOptions();
     }
 }

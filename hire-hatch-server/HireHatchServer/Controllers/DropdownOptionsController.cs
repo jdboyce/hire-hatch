@@ -18,8 +18,12 @@ namespace HireHatchServer.Controllers
         [HttpGet]
         public ActionResult<DropdownOptions> GetDropdownOptions()
         {
-            var dropdownOptions = _jobService.GetDropdownOptions();
-            return Ok(dropdownOptions);
+            var (success, errorMessage, options) = _jobService.GetDropdownOptions();
+            if (!success)
+            {
+                return StatusCode(500, errorMessage);
+            }
+            return Ok(options);
         }
     }
 }

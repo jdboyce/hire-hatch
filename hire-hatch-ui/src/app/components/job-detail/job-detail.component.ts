@@ -14,7 +14,7 @@ import { DropdownOptions } from 'src/app/models/dropdown-options.model';
 export class JobDetailComponent implements OnInit, OnDestroy {
   jobForm!: FormGroup;
   dropdownOptions: DropdownOptions = {
-    types: [],
+    jobTypes: [],
     priorities: [],
     statuses: [],
   };
@@ -37,7 +37,7 @@ export class JobDetailComponent implements OnInit, OnDestroy {
       postingUrl: ['', Validators.required],
       source: [''],
       salary: [''],
-      type: [''],
+      jobType: [''],
       location: [''],
       dateApplied: [''],
       followUpDate: [''],
@@ -59,7 +59,7 @@ export class JobDetailComponent implements OnInit, OnDestroy {
 
     this.jobService.getDropdownOptions().subscribe((options) => {
       if (options) {
-        this.dropdownOptions.types = options.types;
+        this.dropdownOptions.jobTypes = options.jobTypes;
         this.dropdownOptions.priorities = options.priorities;
         this.dropdownOptions.statuses = options.statuses;
       }

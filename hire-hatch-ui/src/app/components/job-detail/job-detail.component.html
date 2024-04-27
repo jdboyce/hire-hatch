@@ -79,12 +79,12 @@
         appearance="outline"
         class="flex-item-small input-form-field"
       >
-        <mat-label>Type</mat-label>
-        <mat-select formControlName="type">
+        <mat-label>Job Type</mat-label>
+        <mat-select formControlName="jobType">
           <mat-option
-            *ngFor="let type of dropdownOptions.types"
-            [value]="type"
-            >{{ type }}</mat-option
+            *ngFor="let jobType of dropdownOptions.jobTypes"
+            [value]="jobType"
+            >{{ jobType }}</mat-option
           >
         </mat-select>
       </mat-form-field>
