@@ -23,7 +23,7 @@ describe('JobService', () => {
       postingUrl: 'https://www.webwizards.com/careers',
       source: 'Company Website',
       salary: '$100,000',
-      type: 'Contract',
+      jobType: 'Contract',
       location: 'Hybrid (Charlotte, NC)',
       dateApplied: new Date('2024-02-06T00:00:00-05:00'),
       followUpDate: undefined,
@@ -39,7 +39,7 @@ describe('JobService', () => {
       postingUrl: 'https://www.indeed.com/jobs/54321',
       source: 'Indeed',
       salary: '$85,000',
-      type: 'Full-time',
+      jobType: 'Full-time',
       location: 'Remote',
       dateApplied: new Date('2024-02-06T00:00:00-05:00'),
       followUpDate: new Date('2024-02-19T00:00:00-05:00'),
@@ -55,7 +55,7 @@ describe('JobService', () => {
       postingUrl: 'https://www.careerbuilder.com/jobs/98765',
       source: 'CareerBuilder',
       salary: '$40/hour',
-      type: 'Part-time',
+      jobType: 'Part-time',
       location: 'On-site (Charlotte, NC)',
       dateApplied: undefined,
       followUpDate: undefined,
@@ -63,7 +63,7 @@ describe('JobService', () => {
     },
   ];
   const mockDropdownOptions: DropdownOptions = {
-    types: ['Full-time', 'Part-time'],
+    jobTypes: ['Full-time', 'Part-time'],
     priorities: ['High', 'Medium', 'Low'],
     statuses: ['Submitted Application', 'Interviewed', 'Offer Accepted'],
   };
@@ -338,7 +338,7 @@ describe('JobService', () => {
         postingUrl: '',
         source: '',
         salary: '',
-        type: '',
+        jobType: '',
         location: '',
         notes: '',
       };
@@ -369,7 +369,7 @@ describe('JobService', () => {
         postingUrl: '',
         source: '',
         salary: '',
-        type: '',
+        jobType: '',
         location: '',
         notes: '',
       };

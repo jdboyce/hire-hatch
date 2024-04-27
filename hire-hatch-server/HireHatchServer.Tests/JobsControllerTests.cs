@@ -20,76 +20,163 @@ namespace hire_hatch_server_tests.Controllers
         }
 
         [TestMethod]
-        public void Get_ReturnsJobs()
+        public void Get_ReturnsServerError_WhenErrorOccurs()
         {
-            var expectedJobs = new List<Job> { new Job(), new Job() };
-            _mockJobService?.Setup(s => s.GetJobs()).Returns(expectedJobs);
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.GetJobs()).Returns((false, "An error occurred.", null));
 
-            var result = _controller?.Get();
+            var controller = new JobsController(mockService.Object);
 
-            Assert.IsNotNull(result?.Value);
-            var actualJobs = result.Value;
-            Assert.AreEqual(expectedJobs.Count, actualJobs.Count());
+            var result = controller.Get();
+
+            var objectResult = result.Result as ObjectResult;
+            Assert.IsNotNull(objectResult);
+            Assert.AreEqual(500, objectResult.StatusCode);
+            Assert.AreEqual("An error occurred.", objectResult.Value);
         }
 
         [TestMethod]
-        public void Put_UpdatesJob_ReturnsNoContent()
+        public void Get_ReturnsOk_WhenJobsAreRetrievedSuccessfully()
         {
-            var jobId = "testId";
-            var updatedJob = new Job();
-            _mockJobService?.Setup(s => s.UpdateJob(jobId, updatedJob)).Returns(true);
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.GetJobs()).Returns((true, null, new List<Job> { new Job() }));
 
-            var result = _controller?.Put(jobId, updatedJob);
+            var controller = new JobsController(mockService.Object);
 
-            Assert.IsInstanceOfType(result, typeof(NoContentResult));
+            var result = controller.Get();
+
+            var okResult = result.Value as List<Job>;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(1, okResult.Count);
         }
 
         [TestMethod]
-        public void Put_JobNotFound_ReturnsNotFound()
+        public void Put_ReturnsNotFound_WhenJobDoesNotExist()
         {
-            var jobId = "testId";
-            var updatedJob = new Job();
-            _mockJobService?.Setup(s => s.UpdateJob(jobId, updatedJob)).Returns(false);
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.UpdateJob(It.IsAny<string>(), It.IsAny<Job>())).Returns((false, "Job not found."));
 
-            var result = _controller?.Put(jobId, updatedJob);
+            var controller = new JobsController(mockService.Object);
 
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+            var result = controller.Put("1", new Job());
+
+            var notFoundResult = result as NotFoundResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
         }
 
         [TestMethod]
-        public void Post_AddsJob()
+        public void Put_ReturnsServerError_WhenErrorOccurs()
         {
-            var newJob = new Job();
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.UpdateJob(It.IsAny<string>(), It.IsAny<Job>())).Returns((false, "An error occurred."));
 
-            var result = _controller?.Post(newJob);
+            var controller = new JobsController(mockService.Object);
 
-            _mockJobService?.Verify(s => s.AddJob(newJob), Times.Once);
+            var result = controller.Put("1", new Job());
+
+            var objectResult = result as ObjectResult;
+            Assert.IsNotNull(objectResult);
+            Assert.AreEqual(500, objectResult.StatusCode);
+            Assert.AreEqual("An error occurred.", objectResult.Value);
+        }
+
+        [TestMethod]
+        public void Put_ReturnsNoContent_WhenJobIsUpdatedSuccessfully()
+        {
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.UpdateJob(It.IsAny<string>(), It.IsAny<Job>())).Returns((true, null));
+
+            var controller = new JobsController(mockService.Object);
+
+            var result = controller.Put("1", new Job());
+
+            var noContentResult = result as NoContentResult;
+            Assert.IsNotNull(noContentResult);
+            Assert.AreEqual(204, noContentResult.StatusCode);
+        }
+
+        [TestMethod]
+        public void Post_ReturnsServerError_WhenErrorOccurs()
+        {
+            var mockService = new Mock<IJobService>();
+            var job = new Job { Id = "1" };
+            mockService.Setup(s => s.AddJob(It.IsAny<Job>())).Returns((false, "An error occurred."));
+
+            var controller = new JobsController(mockService.Object);
+
+            var result = controller.Post(job);
+
+            var objectResult = result as ObjectResult;
+            Assert.IsNotNull(objectResult);
+            Assert.AreEqual(500, objectResult.StatusCode);
+            Assert.AreEqual("An error occurred.", objectResult.Value);
+        }
+
+        [TestMethod]
+        public void Post_ReturnsCreatedAtAction_WhenJobIsAddedSuccessfully()
+        {
+            var mockService = new Mock<IJobService>();
+            var job = new Job { Id = "1" };
+            mockService.Setup(s => s.AddJob(It.IsAny<Job>())).Returns((true, null));
+
+            var controller = new JobsController(mockService.Object);
+
+            var result = controller.Post(job);
+
             var createdAtActionResult = result as CreatedAtActionResult;
             Assert.IsNotNull(createdAtActionResult);
-            var returnValue = createdAtActionResult.Value as Job;
-            Assert.AreEqual(newJob, returnValue);
+            Assert.AreEqual(201, createdAtActionResult.StatusCode);
+            Assert.AreEqual("Get", createdAtActionResult.ActionName);
+            var jobResult = createdAtActionResult.Value as Job;
+            Assert.IsNotNull(jobResult);
+            Assert.AreEqual(job.Id, jobResult.Id);
         }
 
         [TestMethod]
-        public void Delete_JobExists_ReturnsNoContent()
+        public void Delete_ReturnsNotFound_WhenJobDoesNotExist()
         {
-            var jobId = "testId";
-            _mockJobService?.Setup(s => s.DeleteJob(jobId)).Returns(true);
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.DeleteJob(It.IsAny<string>())).Returns((false, "Job not found."));
 
-            var result = _controller?.Delete(jobId);
+            var controller = new JobsController(mockService.Object);
 
-            Assert.IsInstanceOfType(result, typeof(NoContentResult));
+            var result = controller.Delete("1");
+
+            var notFoundResult = result as NotFoundResult;
+            Assert.IsNotNull(notFoundResult);
+            Assert.AreEqual(404, notFoundResult.StatusCode);
         }
 
         [TestMethod]
-        public void Delete_JobDoesNotExist_ReturnsNotFound()
+        public void Delete_ReturnsServerError_WhenErrorOccurs()
         {
-            var jobId = "testId";
-            _mockJobService?.Setup(s => s.DeleteJob(jobId)).Returns(false);
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.DeleteJob(It.IsAny<string>())).Returns((false, "An error occurred."));
 
-            var result = _controller?.Delete(jobId);
+            var controller = new JobsController(mockService.Object);
 
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+            var result = controller.Delete("1");
+
+            var objectResult = result as ObjectResult;
+            Assert.IsNotNull(objectResult);
+            Assert.AreEqual(500, objectResult.StatusCode);
+            Assert.AreEqual("An error occurred.", objectResult.Value);
+        }
+
+        [TestMethod]
+        public void Delete_ReturnsNoContent_WhenJobIsDeletedSuccessfully()
+        {
+            var mockService = new Mock<IJobService>();
+            mockService.Setup(s => s.DeleteJob(It.IsAny<string>())).Returns((true, null));
+
+            var controller = new JobsController(mockService.Object);
+
+            var result = controller.Delete("1");
+
+            var noContentResult = result as NoContentResult;
+            Assert.IsNotNull(noContentResult);
+            Assert.AreEqual(204, noContentResult.StatusCode);
         }
     }
 }

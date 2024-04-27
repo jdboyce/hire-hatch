@@ -32,7 +32,7 @@ describe('JobDetailComponent', () => {
       postingUrl: 'https://www.linkedin.com/jobs/12345',
       source: 'LinkedIn',
       salary: '$95,000',
-      type: 'Full-time',
+      jobType: 'Full-time',
       location: 'Remote',
       dateApplied: new Date('2024-02-10T00:00:00-05:00'),
       followUpDate: new Date('2024-02-23T20:17:38-05:00'),
@@ -48,7 +48,7 @@ describe('JobDetailComponent', () => {
       postingUrl: 'https://www.glassdoor.com/jobs/67890',
       source: 'Glassdoor',
       salary: '$90,000',
-      type: 'Full-time',
+      jobType: 'Full-time',
       location: 'Office',
       dateApplied: new Date('2024-02-06T00:00:00-05:00'),
       followUpDate: undefined,
@@ -57,7 +57,7 @@ describe('JobDetailComponent', () => {
     },
   ];
   const mockDropdownOptions: DropdownOptions = {
-    types: ['Full-time', 'Part-time'],
+    jobTypes: ['Full-time', 'Part-time'],
     priorities: ['High', 'Medium', 'Low'],
     statuses: ['Submitted Application', 'Interviewed', 'Offer Accepted'],
   };
@@ -195,7 +195,7 @@ describe('JobDetailComponent', () => {
         postingUrl: null,
         source: null,
         salary: null,
-        type: null,
+        jobType: null,
         location: null,
         dateApplied: null,
         followUpDate: null,
@@ -206,7 +206,7 @@ describe('JobDetailComponent', () => {
 
     it('should update dropdownOptions when getDropdownOptions is called', () => {
       component.dropdownOptions = {
-        types: [],
+        jobTypes: [],
         priorities: [],
         statuses: [],
       };

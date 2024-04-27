@@ -7,7 +7,7 @@ export interface Job {
   postingUrl: string;
   source: string;
   salary: string;
-  type: string;
+  jobType: string;
   location: string;
   dateApplied?: Date;
   followUpDate?: Date;

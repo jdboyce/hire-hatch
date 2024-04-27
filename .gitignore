@@ -11,3 +11,7 @@
 /hire-hatch-server/HireHatchServer/Properties
 /hire-hatch-server/HireHatchServer/bin/Debug/net8.0
 /hire-hatch-server/HireHatchServer/HireHatchServer.http
+/hire-hatch-server/HireHatchServer/.vs/ProjectEvaluation
+/hire-hatch-server/HireHatchServer/JobDatabase.db
+/hire-hatch-server/HireHatchServer/JobDatabase.db-shm
+/hire-hatch-server/HireHatchServer/JobDatabase.db-wal

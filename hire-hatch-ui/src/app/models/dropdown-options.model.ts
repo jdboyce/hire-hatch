@@ -1,5 +1,5 @@
 export interface DropdownOptions {
-  types: string[];
+  jobTypes: string[];
   priorities: string[];
   statuses: string[];
 }
