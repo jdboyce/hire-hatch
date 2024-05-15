@@ -42,9 +42,11 @@ namespace HireHatchServer.Services
 
                 job.JobTitle = updatedJob.JobTitle;
                 job.CompanyName = updatedJob.CompanyName;
+                job.DateAdded = updatedJob.DateAdded;
                 job.Priority = updatedJob.Priority;
                 job.Status = updatedJob.Status;
                 job.PostingUrl = updatedJob.PostingUrl;
+                job.LastUpdated = DateTime.Now;
                 job.Source = updatedJob.Source;
                 job.Salary = updatedJob.Salary;
                 job.JobType = updatedJob.JobType;
@@ -70,6 +72,8 @@ namespace HireHatchServer.Services
             try
             {
                 job.Id = Guid.NewGuid().ToString();
+                job.DateAdded = DateTime.Now;
+                job.LastUpdated = DateTime.Now;
                 _context.Jobs.Add(job);
                 _context.SaveChanges();
                 return (true, null);

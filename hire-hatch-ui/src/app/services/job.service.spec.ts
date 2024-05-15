@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { NotificationService } from './notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DropdownOptions } from '../models/dropdown-options.model';
+import { NavigationDirection } from '../models/navigation-direction.enum';
 
 describe('JobService', () => {
   const mockJobs: Job[] = [
@@ -18,9 +19,11 @@ describe('JobService', () => {
       id: 'd9f3d0c2-7b6e-4b1e-9c3e-8d7f6c5e4d3d',
       jobTitle: 'Full Stack Developer',
       companyName: 'Creative Minds Co.',
+      dateAdded: new Date('2024-02-05T00:00:00-05:00'),
       priority: 'Medium',
       status: 'Prepping Interview',
       postingUrl: 'https://www.webwizards.com/careers',
+      lastUpdated: new Date('2024-02-07T00:00:00-05:00'),
       source: 'Company Website',
       salary: '$100,000',
       jobType: 'Contract',
@@ -34,9 +37,11 @@ describe('JobService', () => {
       id: 'b4c2b0a4-3d6e-4c1e-9b3e-8a7f6b5c4a3b',
       jobTitle: 'Software Engineer',
       companyName: 'Digital Solutions Ltd.',
+      dateAdded: new Date('2024-02-05T00:00:00-05:00'),
       priority: 'Medium',
       status: 'Offer Received',
       postingUrl: 'https://www.indeed.com/jobs/54321',
+      lastUpdated: new Date('2024-02-06T00:00:00-05:00'),
       source: 'Indeed',
       salary: '$85,000',
       jobType: 'Full-time',
@@ -50,9 +55,11 @@ describe('JobService', () => {
       id: 'dfd1aced-c9b2-48cf-9029-789a9fe4d4de',
       jobTitle: 'Lead Developer',
       companyName: 'InnovateTech Solutions',
+      dateAdded: new Date('2024-02-06T00:00:00-05:00'),
       priority: 'Low',
       status: 'Reviewing Posting',
       postingUrl: 'https://www.careerbuilder.com/jobs/98765',
+      lastUpdated: new Date('2024-02-06T00:00:00-05:00'),
       source: 'CareerBuilder',
       salary: '$40/hour',
       jobType: 'Part-time',
@@ -212,6 +219,17 @@ describe('JobService', () => {
     });
   });
 
+  describe('navigateToJob', () => {
+    it('should call jobNavigation.next with the direction', () => {
+      const direction: NavigationDirection = NavigationDirection.Next;
+      spyOn(service['jobNavigation'], 'next');
+
+      service.navigateToJob(direction);
+
+      expect(service['jobNavigation'].next).toHaveBeenCalledWith(direction);
+    });
+  });
+
   describe('loadData', () => {
     beforeEach(() => {
       mockGetJobs = spyOn(service, 'getJobs');
@@ -227,6 +245,10 @@ describe('JobService', () => {
 
       const convertedJobs = jobs.map((job) => ({
         ...job,
+        dateAdded: job.dateAdded ? new Date(job.dateAdded) : job.dateAdded,
+        lastUpdated: job.lastUpdated
+          ? new Date(job.lastUpdated)
+          : job.lastUpdated,
         dateApplied: job.dateApplied
           ? new Date(job.dateApplied)
           : job.dateApplied,

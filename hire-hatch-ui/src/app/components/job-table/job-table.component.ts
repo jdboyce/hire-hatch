@@ -13,6 +13,7 @@ import { JobService } from 'src/app/services/job.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { NavigationDirection } from 'src/app/models/navigation-direction.enum';
 
 @Component({
   selector: 'app-job-table',
@@ -31,6 +32,7 @@ export class JobTableComponent implements OnInit, OnDestroy, AfterViewInit {
   displayedColumns: string[] = [
     'jobTitle',
     'companyName',
+    'dateAdded',
     'priority',
     'status',
     'postingUrl',
@@ -38,6 +40,7 @@ export class JobTableComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private jobsSubscription?: Subscription;
   private selectedJobSubscription?: Subscription;
+  private jobNavigationSubscription?: Subscription;
 
   constructor(private jobService: JobService) {}
 
@@ -56,6 +59,11 @@ export class JobTableComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     );
+    this.jobNavigationSubscription = this.jobService.jobNavigation$.subscribe(
+      (direction) => {
+        this.navigateToJob(direction);
+      }
+    );
     this.jobService.loadData();
   }
 
@@ -71,6 +79,9 @@ export class JobTableComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.selectedJobSubscription) {
       this.selectedJobSubscription.unsubscribe();
     }
+    if (this.jobNavigationSubscription) {
+      this.jobNavigationSubscription.unsubscribe();
+    }
   }
 
   selectJob(job: Job): void {
@@ -81,6 +92,37 @@ export class JobTableComponent implements OnInit, OnDestroy, AfterViewInit {
   deselectJob(): void {
     this.jobService.deselectJob();
     this.selectedJob = undefined;
+  }
+
+  navigateToJob(direction: NavigationDirection): void {
+    const data = this.dataSource.filteredData;
+    const numberOfJobs = data.length;
+    const lastJobIndex = numberOfJobs - 1;
+
+    if (numberOfJobs > 1) {
+      if (this.selectedJob === undefined) {
+        this.selectJob(data[0]);
+        return;
+      }
+
+      const selectedJobIndex = data.findIndex(
+        (job) => job.id === this.selectedJob?.id
+      );
+
+      if (direction === NavigationDirection.Next) {
+        if (selectedJobIndex < lastJobIndex) {
+          this.selectJob(data[selectedJobIndex + 1]);
+        } else {
+          this.selectJob(data[0]);
+        }
+      } else if (direction === NavigationDirection.Previous) {
+        if (selectedJobIndex > 0) {
+          this.selectJob(data[selectedJobIndex - 1]);
+        } else {
+          this.selectJob(data[lastJobIndex]);
+        }
+      }
+    }
   }
 
   applyFilter(event: Event) {
