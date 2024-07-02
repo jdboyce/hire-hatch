@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+*.user
+/hire-hatch-server/.vs
+/hire-hatch-server/HireHatchServer/.vs/HireHatchServer
+/hire-hatch-server/HireHatchServer/obj
+/hire-hatch-server/HireHatchServer.Tests/bin/Debug/net8.0
+/hire-hatch-server/HireHatchServer.Tests/obj
+/hire-hatch-server/HireHatchServer/Properties
+/hire-hatch-server/HireHatchServer/bin/Debug/net8.0
+/hire-hatch-server/HireHatchServer/HireHatchServer.http
+/hire-hatch-server/HireHatchServer/.vs/ProjectEvaluation
+/hire-hatch-server/HireHatchServer/JobDatabase.db
+/hire-hatch-server/HireHatchServer/JobDatabase.db-shm
+/hire-hatch-server/HireHatchServer/JobDatabase.db-wal

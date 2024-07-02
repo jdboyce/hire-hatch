@@ -1,0 +1,21 @@
+.selected-job {
+  background-color: #99a3b8;
+}
+
+.table-actions {
+  padding: 2px 0 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table-paginator .mat-mdc-paginator-outer-container {
+  max-height: 24px;
+}
+
+.job-link {
+  color: #ffffff;
+}
+
+.job-link:visited {
+  color: #d3d3d3;
+}
