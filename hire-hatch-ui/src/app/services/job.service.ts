@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  catchError,
+  tap,
+  throwError,
+} from 'rxjs';
 import { Job } from '../models/job.model';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
 import { DropdownOptions } from '../models/dropdown-options.model';
+import { NavigationDirection } from '../models/navigation-direction.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +22,9 @@ export class JobService {
   private selectedJob = new BehaviorSubject<Job | null>(null);
   selectedJob$ = this.selectedJob.asObservable();
   newJobSelected: boolean = false;
+  private jobNavigation: Subject<NavigationDirection> =
+    new Subject<NavigationDirection>();
+  jobNavigation$ = this.jobNavigation.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -57,18 +68,20 @@ export class JobService {
     }
   }
 
+  navigateToJob(direction: NavigationDirection): void {
+    this.jobNavigation.next(direction);
+  }
+
   loadData(selectedJobId?: string): void {
     this.getJobs()
       .pipe(
         tap((jobs) => {
           if (jobs.length) {
             jobs.forEach((job) => {
-              if (job.dateApplied) {
-                job.dateApplied = new Date(job.dateApplied);
-              }
-              if (job.followUpDate) {
-                job.followUpDate = new Date(job.followUpDate);
-              }
+              job.dateAdded = job.dateAdded && new Date(job.dateAdded);
+              job.lastUpdated = job.lastUpdated && new Date(job.lastUpdated);
+              job.dateApplied = job.dateApplied && new Date(job.dateApplied);
+              job.followUpDate = job.followUpDate && new Date(job.followUpDate);
             });
             this.jobsSubject.next(jobs);
             if (selectedJobId) {

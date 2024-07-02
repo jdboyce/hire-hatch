@@ -27,9 +27,11 @@ describe('JobDetailComponent', () => {
       id: '3107346e-69ca-4559-bf77-36ff01cfed22',
       jobTitle: 'Frontend Developer',
       companyName: 'Tech Innovations Inc.',
+      dateAdded: new Date('2024-02-15T00:00:00-05:00'),
       priority: 'High',
       status: 'Submitted Application',
       postingUrl: 'https://www.linkedin.com/jobs/12345',
+      lastUpdated: new Date('2024-02-17T00:00:00-05:00'),
       source: 'LinkedIn',
       salary: '$95,000',
       jobType: 'Full-time',
@@ -43,9 +45,11 @@ describe('JobDetailComponent', () => {
       id: 'a6e5e5a0-5c1d-4f6e-8e5f-7e7f8c6e9c7e',
       jobTitle: 'Angular Developer',
       companyName: 'Web Wizards Agency',
+      dateAdded: new Date('2024-02-10T00:00:00-05:00'),
       priority: 'High',
       status: 'Interviewed',
       postingUrl: 'https://www.glassdoor.com/jobs/67890',
+      lastUpdated: new Date('2024-02-12T00:00:00-05:00'),
       source: 'Glassdoor',
       salary: '$90,000',
       jobType: 'Full-time',
@@ -169,7 +173,9 @@ describe('JobDetailComponent', () => {
       mockJobService.selectedJob$ = selectedJobSubject.asObservable();
       component.ngOnInit();
       selectedJobSubject.next(mockJobs[0]);
-      expect(component.jobForm.value).toEqual(_.omit(mockJobs[0], 'id'));
+      expect(component.jobForm.value).toEqual(
+        _.omit(mockJobs[0], 'id', 'dateAdded')
+      );
       expect(component.newJobSelected).toBe(!mockJobs[0].id);
       selectedJobSubject.next(mockJobs[1]);
       expect(component.jobForm.value).toEqual(
@@ -178,7 +184,8 @@ describe('JobDetailComponent', () => {
             ...mockJobs[1],
             followUpDate: mockJobs[1].followUpDate || null,
           },
-          'id'
+          'id',
+          'dateAdded'
         )
       );
       expect(component.newJobSelected).toBe(!mockJobs[1].id);
@@ -193,6 +200,7 @@ describe('JobDetailComponent', () => {
         priority: null,
         status: null,
         postingUrl: null,
+        lastUpdated: null,
         source: null,
         salary: null,
         jobType: null,
@@ -257,7 +265,7 @@ describe('JobDetailComponent', () => {
     });
 
     it('should call jobService.saveJob with form values if the form is dirty, valid, and new', () => {
-      const job = _.omit(mockJobs[1], 'id');
+      const job = _.omit(mockJobs[1], 'id', 'dateAdded');
       component.jobForm.patchValue(job);
       component.jobForm.markAsDirty();
       component.newJobSelected = true;

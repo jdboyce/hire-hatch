@@ -12,11 +12,15 @@ namespace HireHatchServer.Models
         [Required]
         public string CompanyName { get; set; } = string.Empty;
 
+        public DateTime? DateAdded { get; set; }
+
         public string? Priority { get; set; }
         public string? Status { get; set; }
 
         [Required]
         public string PostingUrl { get; set; } = string.Empty;
+
+        public DateTime? LastUpdated { get; set; }
 
         public string? Source { get; set; }
         public string? Salary { get; set; }

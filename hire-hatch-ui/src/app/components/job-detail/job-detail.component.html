@@ -3,11 +3,47 @@
   class="job-detail-form"
 >
   <form [formGroup]="jobForm">
-    <mat-card-header class="header-title-input">
-      <mat-form-field appearance="outline" class="input-form-field">
-        <input matInput placeholder="Job Title" formControlName="jobTitle" />
-      </mat-form-field>
-    </mat-card-header>
+    <div class="detail-header-container">
+      <div class="header-left">
+        <span class="last-updated-title">Last Updated:</span>
+        <span>
+          {{ jobForm.value.lastUpdated | date : "M/d/yyyy" }}
+        </span>
+      </div>
+
+      <div class="header-center">
+        <mat-card-header class="header-title-input">
+          <mat-form-field appearance="outline" class="input-form-field">
+            <input
+              matInput
+              placeholder="Job Title"
+              formControlName="jobTitle"
+            />
+          </mat-form-field>
+        </mat-card-header>
+      </div>
+
+      <div class="header-right">
+        <app-action-button
+          [label]=""
+          [action]="previousJob"
+          [disabled]="newJobSelected"
+          [type]="'button'"
+          [icon]="'arrow_upward'"
+          class="job-navigation-button previous-job-button"
+        ></app-action-button>
+
+        <app-action-button
+          [label]=""
+          [action]="nextJob"
+          [disabled]="newJobSelected"
+          [type]="'button'"
+          [icon]="'arrow_downward'"
+          class="left-action-button"
+          class="job-navigation-button next-job-button"
+        ></app-action-button>
+      </div>
+    </div>
 
     <div class="card-flex-items-container">
       <mat-form-field

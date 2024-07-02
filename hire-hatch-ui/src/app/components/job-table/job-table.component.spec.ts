@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobTableComponent } from './job-table.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Job } from 'src/app/models/job.model';
-import { Subscription, of } from 'rxjs';
+import { Subject, Subscription, of } from 'rxjs';
 import { JobService } from 'src/app/services/job.service';
 import { ActionButtonComponent } from 'src/app/shared/action-button/action-button.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +17,7 @@ import {
 import { MatSortModule } from '@angular/material/sort';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChangeDetectorRef } from '@angular/core';
+import { NavigationDirection } from 'src/app/models/navigation-direction.enum';
 
 describe('JobTableComponent', () => {
   const mockJobs: Job[] = [
@@ -24,9 +25,11 @@ describe('JobTableComponent', () => {
       id: '3107346e-69ca-4559-bf77-36ff01cfed22',
       jobTitle: 'Frontend Developer',
       companyName: 'Tech Innovations Inc.',
+      dateAdded: new Date('2024-02-15T00:00:00-05:00'),
       priority: 'High',
       status: 'Submitted Application',
       postingUrl: 'https://www.linkedin.com/jobs/12345',
+      lastUpdated: new Date('2024-02-17T00:00:00-05:00'),
       source: 'LinkedIn',
       salary: '$95,000',
       jobType: 'Full-time',
@@ -40,9 +43,11 @@ describe('JobTableComponent', () => {
       id: 'a6e5e5a0-5c1d-4f6e-8e5f-7e7f8c6e9c7e',
       jobTitle: 'Angular Developer',
       companyName: 'Web Wizards Agency',
+      dateAdded: new Date('2024-02-10T00:00:00-05:00'),
       priority: 'High',
       status: 'Interviewed',
       postingUrl: 'https://www.glassdoor.com/jobs/67890',
+      lastUpdated: new Date('2024-02-12T00:00:00-05:00'),
       source: 'Glassdoor',
       salary: '$90,000',
       jobType: 'Full-time',
@@ -59,12 +64,14 @@ describe('JobTableComponent', () => {
 
   let component: JobTableComponent;
   let fixture: ComponentFixture<JobTableComponent>;
+  let mockJobNavigationSubject = new Subject<NavigationDirection>();
   let mockJobService = {
     getJobs: () => of(mockJobs),
     selectJob: (job: Job) => {},
     deselectJob: () => {},
     jobs$: of(mockJobs),
     selectedJob$: of(mockJobs[0]),
+    jobNavigation$: mockJobNavigationSubject.asObservable(),
     loadData: () => {},
     addJob: () => {},
     deleteJob: () => {},
@@ -102,6 +109,7 @@ describe('JobTableComponent', () => {
       expect(component.displayedColumns).toEqual([
         'jobTitle',
         'companyName',
+        'dateAdded',
         'priority',
         'status',
         'postingUrl',
@@ -137,6 +145,16 @@ describe('JobTableComponent', () => {
       expect(component.selectedJob).toBeUndefined();
       expect(component.newJobSelected).toBe(false);
     });
+
+    it('should call navigateToJob when jobNavigation$ emits', () => {
+      const direction = NavigationDirection.Next;
+      const navigateToJobSpy = spyOn(component, 'navigateToJob');
+      mockJobService.jobNavigation$ = of(direction);
+
+      component.ngOnInit();
+
+      expect(navigateToJobSpy).toHaveBeenCalledWith(direction);
+    });
   });
 
   describe('ngAfterViewInit', () => {
@@ -152,15 +170,19 @@ describe('JobTableComponent', () => {
     it('should unsubscribe in ngOnDestroy', () => {
       const jobsSubscription = new Subscription();
       const selectedJobSubscription = new Subscription();
+      const jobNavigationSubscription = new Subscription();
       spyOn(jobsSubscription, 'unsubscribe');
       spyOn(selectedJobSubscription, 'unsubscribe');
+      spyOn(jobNavigationSubscription, 'unsubscribe');
       component['jobsSubscription'] = jobsSubscription;
       component['selectedJobSubscription'] = selectedJobSubscription;
+      component['jobNavigationSubscription'] = jobNavigationSubscription;
 
       component.ngOnDestroy();
 
       expect(jobsSubscription.unsubscribe).toHaveBeenCalled();
       expect(selectedJobSubscription.unsubscribe).toHaveBeenCalled();
+      expect(jobNavigationSubscription.unsubscribe).toHaveBeenCalled();
     });
   });
 
@@ -185,6 +207,59 @@ describe('JobTableComponent', () => {
 
       expect(mockJobService.deselectJob).toHaveBeenCalled();
       expect(component.selectedJob).toBeUndefined();
+    });
+  });
+
+  describe('navigateToJob', () => {
+    let selectJobSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      selectJobSpy = spyOn(component, 'selectJob');
+    });
+
+    it('should select the first job if no job is selected', () => {
+      component.selectedJob = undefined;
+      component.dataSource.filteredData = mockJobs;
+
+      component.navigateToJob(NavigationDirection.Next);
+
+      expect(selectJobSpy).toHaveBeenCalledWith(mockJobs[0]);
+    });
+
+    it('should select the next job if the next direction is given and the selected job is not the last one', () => {
+      component.selectedJob = mockJobs[0];
+      component.dataSource.filteredData = mockJobs;
+
+      component.navigateToJob(NavigationDirection.Next);
+
+      expect(selectJobSpy).toHaveBeenCalledWith(mockJobs[1]);
+    });
+
+    it('should select the first job if the next direction is given and the selected job is the last one', () => {
+      component.selectedJob = mockJobs[mockJobs.length - 1];
+      component.dataSource.filteredData = mockJobs;
+
+      component.navigateToJob(NavigationDirection.Next);
+
+      expect(selectJobSpy).toHaveBeenCalledWith(mockJobs[0]);
+    });
+
+    it('should select the previous job if the previous direction is given and the selected job is not the first one', () => {
+      component.selectedJob = mockJobs[1];
+      component.dataSource.filteredData = mockJobs;
+
+      component.navigateToJob(NavigationDirection.Previous);
+
+      expect(selectJobSpy).toHaveBeenCalledWith(mockJobs[0]);
+    });
+
+    it('should select the last job if the previous direction is given and the selected job is the first one', () => {
+      component.selectedJob = mockJobs[0];
+      component.dataSource.filteredData = mockJobs;
+
+      component.navigateToJob(NavigationDirection.Previous);
+
+      expect(selectJobSpy).toHaveBeenCalledWith(mockJobs[mockJobs.length - 1]);
     });
   });
 

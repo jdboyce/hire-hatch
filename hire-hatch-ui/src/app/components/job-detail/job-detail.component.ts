@@ -5,6 +5,7 @@ import { NotificationService } from 'src/app/services/notification.service';
 import { Job } from 'src/app/models/job.model';
 import { Subscription, take } from 'rxjs';
 import { DropdownOptions } from 'src/app/models/dropdown-options.model';
+import { NavigationDirection } from 'src/app/models/navigation-direction.enum';
 
 @Component({
   selector: 'app-job-detail',
@@ -35,6 +36,7 @@ export class JobDetailComponent implements OnInit, OnDestroy {
       priority: [''],
       status: [''],
       postingUrl: ['', Validators.required],
+      lastUpdated: [''],
       source: [''],
       salary: [''],
       jobType: [''],
@@ -72,6 +74,14 @@ export class JobDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  nextJob = (): void => {
+    this.jobService.navigateToJob(NavigationDirection.Next);
+  };
+
+  previousJob = (): void => {
+    this.jobService.navigateToJob(NavigationDirection.Previous);
+  };
+
   openUrl() {
     window.open(this.jobForm.get('postingUrl')?.value, '_blank');
   }
@@ -80,7 +90,11 @@ export class JobDetailComponent implements OnInit, OnDestroy {
     if (this.jobForm.dirty && this.jobForm.valid) {
       let job = this.jobForm.value;
       if (!this.newJobSelected) {
-        job = { id: this.originalJobData?.id, ...this.jobForm.value };
+        job = {
+          id: this.originalJobData?.id,
+          dateAdded: this.originalJobData?.dateAdded,
+          ...this.jobForm.value,
+        };
       }
       this.jobService.saveJob(job).subscribe({
         next: () => {
