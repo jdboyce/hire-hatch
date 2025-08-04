@@ -12,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from './notification.service';
 import { DropdownOptions } from '../models/dropdown-options.model';
 import { NavigationDirection } from '../models/navigation-direction.enum';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,7 @@ export class JobService {
   private jobNavigation: Subject<NavigationDirection> =
     new Subject<NavigationDirection>();
   jobNavigation$ = this.jobNavigation.asObservable();
+  private readonly apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
@@ -32,7 +34,7 @@ export class JobService {
   ) {}
 
   getJobs(): Observable<Job[]> {
-    return this.http.get<Job[]>('http://localhost:5098/api/jobs').pipe(
+    return this.http.get<Job[]>(`${this.apiUrl}/jobs`).pipe(
       catchError((error) => {
         console.error('An error occurred:', error);
         return throwError(() => error);
@@ -42,7 +44,7 @@ export class JobService {
 
   getDropdownOptions(): Observable<DropdownOptions> {
     return this.http
-      .get<DropdownOptions>('http://localhost:5098/api/dropdown-options')
+      .get<DropdownOptions>(`${this.apiUrl}/dropdown-options`)
       .pipe(
         catchError((error) => {
           console.error('An error occurred:', error);
@@ -103,21 +105,19 @@ export class JobService {
 
   saveJob(job: Job): Observable<Job> {
     if (job.id) {
-      return this.http
-        .put<Job>(`http://localhost:5098/api/jobs/${job.id}`, job)
-        .pipe(
-          catchError((error) => {
-            this.selectJob(this.jobsSubject.getValue()[0]);
-            console.error('An error occurred while saving the job:', error);
-            return throwError(() => error);
-          }),
-          tap(() => {
-            this.loadData(job.id);
-          })
-        );
+      return this.http.put<Job>(`${this.apiUrl}/jobs/${job.id}`, job).pipe(
+        catchError((error) => {
+          this.selectJob(this.jobsSubject.getValue()[0]);
+          console.error('An error occurred while saving the job:', error);
+          return throwError(() => error);
+        }),
+        tap(() => {
+          this.loadData(job.id);
+        })
+      );
     } else {
       const newJob = job;
-      return this.http.post<Job>(`http://localhost:5098/api/jobs`, newJob).pipe(
+      return this.http.post<Job>(`${this.apiUrl}/jobs`, newJob).pipe(
         catchError((error) => {
           this.newJobSelected = false;
           this.selectJob(this.jobsSubject.getValue()[0]);
@@ -175,9 +175,7 @@ export class JobService {
         .subscribe((confirmed) => {
           if (confirmed) {
             this.http
-              .delete(
-                `http://localhost:5098/api/jobs/${currentSelectedJob?.id}`
-              )
+              .delete(`${this.apiUrl}/jobs/${currentSelectedJob?.id}`)
               .subscribe({
                 next: () => {
                   this.loadData();
