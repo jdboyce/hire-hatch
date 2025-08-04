@@ -12,6 +12,7 @@ import { NotificationService } from './notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DropdownOptions } from '../models/dropdown-options.model';
 import { NavigationDirection } from '../models/navigation-direction.enum';
+import { environment } from '../../environments/environment';
 
 describe('JobService', () => {
   const mockJobs: Job[] = [
@@ -19,16 +20,16 @@ describe('JobService', () => {
       id: 'd9f3d0c2-7b6e-4b1e-9c3e-8d7f6c5e4d3d',
       jobTitle: 'Full Stack Developer',
       companyName: 'Creative Minds Co.',
-      dateAdded: new Date('2024-02-05T00:00:00-05:00'),
+      dateAdded: new Date('2025-08-05T00:00:00-05:00'),
       priority: 'Medium',
       status: 'Prepping Interview',
       postingUrl: 'https://www.webwizards.com/careers',
-      lastUpdated: new Date('2024-02-07T00:00:00-05:00'),
+      lastUpdated: new Date('2025-08-07T00:00:00-05:00'),
       source: 'Company Website',
       salary: '$100,000',
       jobType: 'Contract',
       location: 'Hybrid (Charlotte, NC)',
-      dateApplied: new Date('2024-02-06T00:00:00-05:00'),
+      dateApplied: new Date('2025-08-06T00:00:00-05:00'),
       followUpDate: undefined,
       notes:
         '.NET Core and React in stack. Good salary. Offers annual tech conference tickets.',
@@ -37,17 +38,17 @@ describe('JobService', () => {
       id: 'b4c2b0a4-3d6e-4c1e-9b3e-8a7f6b5c4a3b',
       jobTitle: 'Software Engineer',
       companyName: 'Digital Solutions Ltd.',
-      dateAdded: new Date('2024-02-05T00:00:00-05:00'),
+      dateAdded: new Date('2025-08-05T00:00:00-05:00'),
       priority: 'Medium',
       status: 'Offer Received',
       postingUrl: 'https://www.indeed.com/jobs/54321',
-      lastUpdated: new Date('2024-02-06T00:00:00-05:00'),
+      lastUpdated: new Date('2025-08-06T00:00:00-05:00'),
       source: 'Indeed',
       salary: '$85,000',
       jobType: 'Full-time',
       location: 'Remote',
-      dateApplied: new Date('2024-02-06T00:00:00-05:00'),
-      followUpDate: new Date('2024-02-19T00:00:00-05:00'),
+      dateApplied: new Date('2025-08-06T00:00:00-05:00'),
+      followUpDate: new Date('2025-08-19T00:00:00-05:00'),
       notes:
         'Dynamic culture with emphasis on agile development. Competitive benefits.',
     },
@@ -55,11 +56,11 @@ describe('JobService', () => {
       id: 'dfd1aced-c9b2-48cf-9029-789a9fe4d4de',
       jobTitle: 'Lead Developer',
       companyName: 'InnovateTech Solutions',
-      dateAdded: new Date('2024-02-06T00:00:00-05:00'),
+      dateAdded: new Date('2025-08-06T00:00:00-05:00'),
       priority: 'Low',
       status: 'Reviewing Posting',
       postingUrl: 'https://www.careerbuilder.com/jobs/98765',
-      lastUpdated: new Date('2024-02-06T00:00:00-05:00'),
+      lastUpdated: new Date('2025-08-06T00:00:00-05:00'),
       source: 'CareerBuilder',
       salary: '$40/hour',
       jobType: 'Part-time',
@@ -126,7 +127,7 @@ describe('JobService', () => {
         expect(jobs).toEqual(mockJobs);
       });
 
-      const request = httpMock.expectOne(`http://localhost:5098/api/jobs`);
+      const request = httpMock.expectOne(`${environment.apiUrl}/jobs`);
       expect(request.request.method).toBe('GET');
       request.flush(mockJobs);
     });
@@ -141,7 +142,7 @@ describe('JobService', () => {
         },
       });
 
-      const request = httpMock.expectOne('http://localhost:5098/api/jobs');
+      const request = httpMock.expectOne(`${environment.apiUrl}/jobs`);
       request.error(mockError);
     });
   });
@@ -153,7 +154,7 @@ describe('JobService', () => {
       });
 
       const request = httpMock.expectOne(
-        `http://localhost:5098/api/dropdown-options`
+        `${environment.apiUrl}/dropdown-options`
       );
       expect(request.request.method).toBe('GET');
       request.flush(mockDropdownOptions);
@@ -170,7 +171,7 @@ describe('JobService', () => {
       });
 
       const request = httpMock.expectOne(
-        'http://localhost:5098/api/dropdown-options'
+        `${environment.apiUrl}/dropdown-options`
       );
       request.error(mockError);
     });
@@ -305,7 +306,7 @@ describe('JobService', () => {
       service.saveJob(mockJob).subscribe();
 
       const req = httpMock.expectOne(
-        `http://localhost:5098/api/jobs/${mockJob.id}`
+        `${environment.apiUrl}/jobs/${mockJob.id}`
       );
       expect(req.request.method).toBe('PUT');
       req.flush(mockJob);
@@ -323,7 +324,7 @@ describe('JobService', () => {
         expect(savedJob).toEqual(createdJob);
       });
 
-      const request = httpMock.expectOne(`http://localhost:5098/api/jobs`);
+      const request = httpMock.expectOne(`${environment.apiUrl}/jobs`);
       expect(request.request.method).toBe('POST');
       request.flush(createdJob);
 
@@ -427,7 +428,7 @@ describe('JobService', () => {
 
       service.deleteJob();
 
-      const req = httpMock.expectNone('http://localhost:5098/api/jobs/123');
+      const req = httpMock.expectNone(`${environment.apiUrl}/jobs/123`);
       expect(req).toBeUndefined();
     });
 
@@ -439,13 +440,11 @@ describe('JobService', () => {
 
       service.deleteJob();
 
-      const req = httpMock.expectOne(
-        `http://localhost:5098/api/jobs/${mockJobId}`
-      );
+      const req = httpMock.expectOne(`${environment.apiUrl}/jobs/${mockJobId}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
 
-      const getReq = httpMock.expectOne('http://localhost:5098/api/jobs');
+      const getReq = httpMock.expectOne(`${environment.apiUrl}/jobs`);
       expect(getReq.request.method).toBe('GET');
       getReq.flush(mockJobs);
     });
@@ -459,7 +458,7 @@ describe('JobService', () => {
       service.deleteJob();
 
       const req = httpMock.expectOne(
-        `http://localhost:5098/api/jobs/${mockJobs[1].id}`
+        `${environment.apiUrl}/jobs/${mockJobs[1].id}`
       );
       req.flush(null);
 
@@ -475,7 +474,7 @@ describe('JobService', () => {
       service.deleteJob();
 
       const req = httpMock.expectOne(
-        `http://localhost:5098/api/jobs/${mockJobs[0].id}`
+        `${environment.apiUrl}/jobs/${mockJobs[0].id}`
       );
       req.flush('Server error', { status: 500, statusText: 'Server Error' });
 
