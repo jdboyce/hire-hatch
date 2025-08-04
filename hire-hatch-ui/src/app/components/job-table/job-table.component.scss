@@ -5,7 +5,8 @@
 .table-actions {
   padding: 2px 0 12px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
 }
 
 .table-paginator .mat-mdc-paginator-outer-container {
@@ -14,8 +15,25 @@
 
 .job-link {
   color: #ffffff;
+  text-decoration: underline;
+  max-width: 200px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .job-link:visited {
   color: #d3d3d3;
+}
+
+.mat-mdc-table .mat-mdc-cell:nth-child(6) {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mat-mdc-table .mat-mdc-header-cell:nth-child(6) {
+  max-width: 200px;
 }
